@@ -1,8 +1,8 @@
 """Model manifest: load, verify, download (pinned revisions) and migrate from a local Hugging Face cache.
 
 Models are stored as plain files under the models root, one directory per model, never as cache snapshots made of
-symlinks, so they can be copied or moved freely. Every operation is idempotent: a model whose files already match
-the manifest is left alone.
+symlinks, so they can be copied or moved freely. `download` and `migrate` skip a model whose recorded files
+already verify; a model without recorded files is fetched again.
 """
 
 from __future__ import annotations
@@ -51,7 +51,6 @@ def load_manifest(path: Path = MANIFEST_PATH) -> dict[str, Model]:
     return {mid: Model(id=mid, **spec) for mid, spec in doc["models"].items()}
 
 
-# ------------------------------------------------------------------------------------------------------ hashing
 def _walk(directory: Path) -> list[Path]:
     out = []
     for p in sorted(directory.rglob("*")):
@@ -96,7 +95,8 @@ def verify(model: Model, root: Path, deep: bool = True) -> list[str]:
 
 
 def lock(manifest_path: Path, ids: list[str], root: Path) -> None:
-    """Record the size and SHA-256 of every file of the given (already verified-by-source) models."""
+    """Record the size and SHA-256 of every file of the given models as currently installed (not checked against
+    their source)."""
     doc = yaml.safe_load(manifest_path.read_text())
     for mid in ids:
         d = root / doc["models"][mid]["path"]
@@ -105,7 +105,6 @@ def lock(manifest_path: Path, ids: list[str], root: Path) -> None:
     manifest_path.write_text(header + yaml.safe_dump(doc, sort_keys=False, width=120))
 
 
-# ------------------------------------------------------------------------------------------------ installation
 def _clone_file(src: Path, dst: Path) -> None:
     """Copy one file (following symlinks). On APFS `cp -c` makes a copy-on-write clone: instant, no extra space."""
     dst.parent.mkdir(parents=True, exist_ok=True)

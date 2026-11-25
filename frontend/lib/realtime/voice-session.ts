@@ -1,6 +1,6 @@
 /**
- * One spoken session with the local voice engine: streams the microphone up, plays the assistant's speech, keeps the
- * engine's history true on interruptions, and reports transcript and state changes. What the session is about
+ * One spoken session with the local voice engine: streams the microphone up, plays the assistant's speech, corrects
+ * the engine's history on interruptions, and reports transcript and state changes. What the session is about
  * (the persona) comes entirely from its SessionConfig.
  */
 
@@ -237,7 +237,7 @@ function browserPlayback(): Playback {
   return new AudioPlayback(context);
 }
 
-/** The real thing: the browser's audio and WebSocket. `?halfDuplex` in the page URL turns on half-duplex. */
+/** Production factory: browser audio and WebSocket. `?halfDuplex` in the page URL turns on half-duplex. */
 export const browserVoice: VoiceFactory = (config, callbacks) =>
   new VoiceSession(config, callbacks, {
     connect: (url) => connectRealtime(url),

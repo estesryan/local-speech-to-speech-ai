@@ -1,5 +1,6 @@
 /**
- * Assistant speech playback, and the accounting the interruption fix needs: how much of each reply was actually played.
+ * Assistant speech playback, and the accounting the interruption fix needs: how much of each reply has played by
+ * AudioContext time (output latency is not included).
  */
 
 import type { LevelSource } from "@/lib/audio/levels";

@@ -45,7 +45,7 @@ export const EntrySnapshotSchema = z.object({
   atMs: sessionTimeMs,
 });
 
-/** The speaker was cut off: keep only the words actually heard (a prefix of the current text) and finalize. */
+/** The speaker was cut off: keep only the words heard (a prefix of the current text) and finalize. */
 export const EntryTruncatedSchema = z.object({
   type: z.literal("entry.truncated"),
   entryId,

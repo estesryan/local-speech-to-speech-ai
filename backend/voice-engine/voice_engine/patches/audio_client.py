@@ -2,8 +2,8 @@
 
 Two classes in `speech_to_speech.api.openai_realtime.audio_client` are replaced with subclasses:
 
-- PlaybackBuffer: additionally counts bytes handed to the speaker and bytes dropped on interruption, so the
-  position of a reply's audio that was actually played is known exactly.
+- PlaybackBuffer: additionally counts bytes handed to the audio device and bytes dropped on interruption, so the
+  playback position within each reply is known (excluding the device's output latency).
 - _ToolCallCoordinator: upstream already calls it with every server event, before its own event handler clears
   the playback buffer on barge-in, and it holds the connection. The subclass also feeds events to
   `InterruptionHistory` and sends the events it returns.

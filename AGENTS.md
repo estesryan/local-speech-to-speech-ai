@@ -27,12 +27,13 @@ Guidance for AI coding agents working on Local Speech-to-Speech AI. Read these f
 - **Prompts:**
   - Persona prompts live only in `backend/voice-engine/personas/`.
   - The engine instructions and the interruption note text are in `voice_engine/interruption.py`, mirrored in
-    `frontend/lib/realtime/interruption.ts` and the shared event traces. Keep all three in step.
+    `frontend/lib/realtime/interruption.ts` and the shared event traces. Keep all three consistent.
   - Wording changes alter model behaviour and need a live check by a person.
 - **Security and consent:**
   - Do not widen the engine's network exposure (it listens on `127.0.0.1` behind an Origin allowlist).
   - Do not let clients send prompt text or choose voices.
-  - Do not bypass Voice Studio's consent requirement or the rule that personas cannot use saved voices.
+  - Do not bypass Voice Studio's consent requirement or the rule that a persona cannot name a saved voice (only a
+    built-in preset or `conversation-default`).
 - **Models:**
   - Never modify, move or delete anything in `models/`.
   - Do not download models or change `model-manifest.yaml` unless asked; downloads are several gigabytes.

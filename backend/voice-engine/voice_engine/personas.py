@@ -1,13 +1,11 @@
-"""Personas: who the assistant is, kept apart from the engine's operational instructions.
+"""Personas (`personas/<id>.yaml`): the assistant's name (`host`), prompt and voice.
 
-A persona (`personas/<id>.yaml`) describes only the assistant (`host` is its name). The LLM system prompt is always
-composed as the persona prompt followed by the engine's instructions (`ENGINE_INSTRUCTIONS`), which the
-interruption fix depends on. A persona cannot remove or replace the engine instructions; profiles may not set the
-prompt at all, and Realtime clients can only choose a persona (patches/session_persona.py).
+The system prompt is always the persona prompt followed by `ENGINE_INSTRUCTIONS`, which the interruption fix
+depends on, so a persona cannot remove them. Profiles may not set the prompt, and Realtime clients can only choose a
+persona by id (patches/session_persona.py).
 
-A persona also fixes its voice: a built-in preset (`preset-aiden`), or `conversation-default` to speak in the voice
-the user chose in Voice Studio. Clients cannot pick a voice. A persona can never use a saved Voice Studio voice (a
-synthetic copy of someone's voice).
+A persona's voice is a built-in preset (`preset-aiden`) or `conversation-default`, the voice the user chose in Voice
+Studio. A persona cannot name a saved voice (a synthetic copy of someone's voice), and clients cannot pick a voice.
 """
 
 from __future__ import annotations

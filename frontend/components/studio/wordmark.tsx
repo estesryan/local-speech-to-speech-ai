@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-/** The app title as a wordmark: Inter 700, white, tight tracking (-1.5 at 45px). */
+/** The app title shown in the header. */
 export function Wordmark({ className }: { className?: string }) {
   return (
     <span

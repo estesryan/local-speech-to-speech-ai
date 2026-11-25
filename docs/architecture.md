@@ -3,7 +3,7 @@
 The project has two processes on one Mac: a **browser app** (`frontend/`, Next.js) and a **voice engine**
 (`backend/voice-engine/`, Python). The engine wraps Hugging Face
 [speech-to-speech](https://github.com/huggingface/speech-to-speech) 1.1.0 ("upstream") and runs every model locally
-on MLX. Nothing leaves the machine.
+on MLX. At run time nothing leaves the machine.
 
 ```
 Browser (localhost:3000)                          Voice engine (127.0.0.1:8765)
@@ -13,7 +13,7 @@ Browser (localhost:3000)                          Voice engine (127.0.0.1:8765)
 │                              │  Realtime events │   → Qwen3.5 via mlx-lm    (reply text)        │
 │ playback ◄── audio deltas ◄──┼◄─────────────────┤   → Qwen3-TTS             (text → speech)     │
 │ transcript, state machine    │                  │                                               │
-│ Voice panel ── HTTP ─────────┼─────────────────►│ Voice Studio API (/v1/voices)            │
+│ Voice panel ── HTTP ─────────┼─────────────────►│ Voice Studio API (/v1/voices)                 │
 └──────────────────────────────┘                  └───────────────────────────────────────────────┘
 ```
 
@@ -61,8 +61,8 @@ using an OpenAI Realtime-style protocol:
 2. **Persona:** the engine loads the persona, composes its prompt and resolves its voice. An unknown persona is
    refused. If the persona's voice is unavailable, the engine reports an `error` event and closes; it never
    substitutes a different voice.
-3. **Session setup:** after `session.created`, the engine sends its own event, `voice_engine.session`, naming the voice
-   in use and, if the user's chosen default could not be used, why Serena was used instead. The client then sends
+3. **Session setup:** after `session.created`, the engine sends its own event, `voice_engine.session`, naming the
+   voice in use and, if the user's chosen default could not be used, why Serena was used instead. The client then sends
    its `session.update`.
 4. **Client restrictions:** `instructions` and `audio.output.voice` are stripped from client events, and
    `system`/`developer` messages are dropped. Only the server sets the prompt and voice.
@@ -79,12 +79,12 @@ appears.
 ## Turn-taking and interruptions
 
 Silero VAD and Smart Turn decide when the user has finished speaking. When the user starts talking while the
-assistant speaks (`input_audio_buffer.speech_started`), the page clears its playback at once and upstream cancels the reply
-if it is still being generated.
+assistant speaks (`input_audio_buffer.speech_started`), the page clears its playback immediately and upstream
+cancels the reply if it is still being generated.
 
 Upstream then drops the interrupted reply from its history, so the model would not know it was interrupted and
-tends to ask its question again. Only the client knows how much audio was played, so the fix is client-side and uses
-only the public protocol:
+tends to ask its question again. Only the client knows how much audio it has played, so the fix is client-side and
+uses only the public protocol:
 
 - The unheard reply is removed: upstream has already removed a reply that was still generating, and the client
   deletes one that was already finalized (`conversation.item.delete`).
@@ -93,16 +93,22 @@ only the public protocol:
   model to treat it as context, never read it aloud, and follow the user.
 - The transcript keeps only the words that were heard.
 
+What was heard is an estimate. The client knows how many samples of each reply it has played (the browser from
+`AudioContext` time, the terminal client from bytes handed to the audio device; neither includes output latency)
+and maps that position onto the reply text in proportion to its length, or by this session's measured speaking
+rate while the reply's audio is still arriving.
+
 **Why whole sentences:** Qwen3.5 imitates its own earlier turns. Truncated assistant turns, markers in them, or
 quoted half-sentences made later replies come out truncated, read the marker aloud, or finish the abandoned
 sentence. The prompts call the user "the guest"; that wording is part of the tested prompt.
 
 There are two implementations: `frontend/lib/realtime/interruption.ts` (browser) and
-`voice_engine/interruption.py` (the terminal client, `voice-engine run` / `talk`). Both replay the same event traces in
-tests, so they must change together.
+`voice_engine/interruption.py` (the terminal client, `voice-engine run` / `talk`). Both replay the same event
+traces in tests, so they must change together.
 
 **Speakers:** the browser's echo cancellation is on, but whether it suppresses the assistant's own voice from laptop
-speakers has not been verified. `?halfDuplex` in the page URL sends silence while the assistant speaks, which disables interruptions.
+speakers has not been verified. `?halfDuplex` in the page URL sends silence while the assistant speaks, which
+disables interruptions.
 
 ## Voice Studio
 
@@ -111,14 +117,15 @@ with CORS for the same allowed origins.
 
 - **Built-in voices:** six Qwen3-TTS CustomVoice presets. Serena is the default until the user chooses another.
 - **Saved voices:** recorded, uploaded or designed. Each is a reference clip plus its transcript in
-  `data/voices/<id>/` (or `VOICE_ENGINE_VOICES_DIR`). Record and Upload require the owner's consent; the transcript comes
-  from Parakeet. Describe uses the VoiceDesign model to generate three candidates; the chosen one becomes the
+  `data/voices/<id>/` (or `VOICE_ENGINE_VOICES_DIR`). Record and Upload require the owner's consent; the transcript
+  comes from Parakeet. Describe uses the VoiceDesign model to generate three candidates; the chosen one becomes the
   reference.
 - **Live use:** a saved voice is cloned by the Qwen3-TTS **Base** model on every reply, through upstream's own
   streaming path, so cancellation and the MLX lock behave as they do for presets.
 - **Fixed per session:** the voice is chosen when a session starts; a new default applies from the next one.
-- **Personas:** `assistant` speaks in the user's chosen default. Other personas use a fixed preset and can
-  never use a saved voice.
+- **Personas:** a persona's voice is either a built-in preset or `conversation-default` (the user's chosen
+  default, which may be a saved voice); a persona can never name a saved voice directly. `assistant` uses
+  `conversation-default`; `ren-test` uses a fixed preset.
 - **No conflict with live speech:** conversations and generation (previews, transcription, design) exclude each
   other. Generation is refused with 409 while a conversation is connected, and a conversation is refused with an
   `error` event while generation runs. The voice a conversation speaks in cannot be deleted until it ends.
@@ -131,9 +138,11 @@ with CORS for the same allowed origins.
 ## Upstream boundary
 
 Nothing inside `.venv` is edited. `voice-engine` replaces specific upstream functions in memory at launch
-(`voice_engine/patches/`). Each patch first checks the upstream version (1.1.0) and the exact source it depends on,
-and stops with `UpstreamIncompatible` if either changed. `VOICE_ENGINE_ALLOW_UNTESTED_UPSTREAM=1` skips only the
-version check.
+(`voice_engine/patches/`). Before patching, the launcher checks the upstream version (1.1.0), and each patch checks
+that the attributes it uses exist and that the upstream functions it replaces or relies on still contain the
+source snippets it depends on. Any mismatch stops the launch with `UpstreamIncompatible`. These are targeted checks,
+not a comparison of the whole upstream source. `VOICE_ENGINE_ALLOW_UNTESTED_UPSTREAM=1` skips only the version
+check.
 
 | Patch | Purpose |
 |---|---|
