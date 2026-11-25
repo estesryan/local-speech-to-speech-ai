@@ -25,7 +25,9 @@ blocks:
     settings:
       smart_turn_model_path: manifest:vad/smart-turn-v3.2#smart-turn-v3.2-cpu.onnx
       smart_turn_threshold: 0.5
-      smart_turn_incomplete_delay_ms: 600   # the hold behind the ~2.3 s latency tail; lower = snappier, more cut-offs
+      # Extra hold for turns judged incomplete, behind the ~2.3 s latency tail. Lower values reduce latency but
+      # end more turns prematurely.
+      smart_turn_incomplete_delay_ms: 600
       smart_turn_max_wait_ms: 2000
   stt:
     kind: stt

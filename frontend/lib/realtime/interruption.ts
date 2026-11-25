@@ -1,11 +1,12 @@
 /**
- * Keep the voice engine's history true to what the user heard when they interrupt the assistant.
+ * Keep the voice engine's history consistent with what the user heard when they interrupt the assistant.
  *
- * A port of backend/voice-engine/voice_engine/interruption.py (read its docstring for the why). Upstream cancels an
- * interrupted reply but drops it from its history, and only the client knows how much audio was played. So when
- * the assistant is cut off, the unheard reply is deleted (if it was already finalized) and a note quoting the complete
- * sentences the user heard is added on the user's side. Both implementations replay the same event traces
- * (backend/voice-engine/tests/fixtures/traces/); keep them in step.
+ * A port of backend/voice-engine/voice_engine/interruption.py; see the Python implementation for rationale.
+ * Upstream cancels an interrupted reply but drops it from its history, and only the client knows how much audio
+ * it has played. So when the assistant is cut off, the unheard reply is deleted (if it was already finalized) and a
+ * note quoting the complete sentences the user heard (estimated from the playback position) is added on the
+ * user's side. Both implementations replay the same event traces (backend/voice-engine/tests/fixtures/traces/);
+ * keep both implementations consistent.
  */
 
 export const NOTE_PREFIX = "(The guest interrupts you.";

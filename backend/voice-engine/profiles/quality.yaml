@@ -1,4 +1,4 @@
-# Optional profile: Qwen3.5-9B (MLX 4-bit). Warmer replies; ~0.15 s slower, ~11.3 GB, longer replies.
+# Optional profile: Qwen3.5-9B (MLX 4-bit). Measured against fast: ~0.15 s slower, ~11.3 GB, longer replies.
 voice_engine:
   description: Qwen3.5-9B 4-bit, optional
 blocks:

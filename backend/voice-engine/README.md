@@ -15,10 +15,10 @@ uv run voice-engine config       # print the rendered upstream configuration
 ```
 
 `run`, `serve` and `config` take `--profile` (default `fast`; `VOICE_ENGINE_PROFILE` changes it for `run` and
-`serve`) and `--persona` (default `assistant`, or `VOICE_ENGINE_PERSONA`). `talk --url` targets another server. `run --speakers` mutes the microphone while the assistant talks, for use without
-headphones (no interruptions).
+`serve`) and `--persona` (default `assistant`, or `VOICE_ENGINE_PERSONA`). `talk --url` targets another server.
+`run --speakers` mutes the microphone while the assistant talks, for use without headphones (no interruptions).
 
-`run` waits until it logs "Ready — start speaking." (about 8 s); press Ctrl+C to stop. macOS asks for microphone
+`run` is ready when it logs "Ready — start speaking."; press Ctrl+C to stop. macOS asks for microphone
 access the first time: allow it for your terminal app (System Settings → Privacy & Security → Microphone).
 
 `scripts/setup.sh [fast|quality|all]` is idempotent. It runs `uv sync --frozen`, then downloads and verifies that
@@ -26,7 +26,8 @@ profile's models, then runs the unit tests.
 
 ## Models
 
-All weights live in `<project>/models/` (override with `VOICE_ENGINE_MODELS_DIR`), as plain files organized by component:
+All weights live in `<project>/models/` (override with `VOICE_ENGINE_MODELS_DIR`), as plain files organized by
+component:
 
 ```
 models/
@@ -44,7 +45,8 @@ models/
 
 `model-manifest.yaml` lists every model's repository, pinned commit, quantization, license, path, and the size and
 SHA-256 of every file. At run time models load only by path, with Hugging Face offline mode on and an empty
-Hugging Face home, so a missing model fails loudly instead of being downloaded or taken from another cache.
+Hugging Face home, so a missing model fails at startup instead of being downloaded or taken from another cache.
+Launch checks only that each required file is present with the recorded size; `models verify` also checks SHA-256.
 
 | Command | What it does |
 |---|---|
@@ -92,15 +94,15 @@ never a saved Voice Studio voice.
 | Record / Upload | a 3–30 s reference of a consenting speaker, transcribed by Parakeet | Qwen3-TTS **Base** clones it live |
 | Describe | VoiceDesign speaks a fixed passage in three voices matching a description; the chosen clip becomes the reference | **VoiceDesign** to create, then Base |
 
-Base and VoiceDesign are optional (`voice_engine.optional` in `profiles/base.yaml`); without them the Voice panel shows
-those methods as unavailable.
+Base and VoiceDesign are optional (`voice_engine.optional` in `profiles/base.yaml`); without them the Voice panel
+shows those methods as unavailable.
 
-**Memory:**
+**Memory** (approximate measurements; actual use varies with hardware, profile and macOS):
 - About 8 GB with presets only.
 - About 11 GB once a custom voice has been used (Base stays loaded).
 - Up to about 14 GB while VoiceDesign generates candidates (released afterwards).
 
-A custom voice adds about 30 ms to the first audio of each reply.
+In measurements, a custom voice added about 30 ms to the first audio of each reply.
 
 **Storage** (`<project>/data/voices/`, override `VOICE_ENGINE_VOICES_DIR`; private and git-ignored):
 - `<voice-id>/profile.json`: model and pinned revision, reference transcript, method, design description, owner

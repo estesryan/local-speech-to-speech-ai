@@ -1,8 +1,8 @@
 """Runtime fixes for speech-to-speech 1.1.0, applied by `voice-engine` before upstream starts.
 
-Nothing inside the virtual environment is edited: each patch replaces one attribute in memory. Before patching,
-each one checks the upstream version and the exact upstream code it depends on, and stops the launcher with
-`UpstreamIncompatible` if either differs. The compaction fix becomes a no-op once upstream fixes that defect.
+Nothing inside the virtual environment is edited: each patch replaces upstream attributes in memory. Before
+patching, the upstream version is checked, and each patch checks the attributes and source snippets it depends on
+(`require`, `require_source`); any mismatch stops the launcher with `UpstreamIncompatible`. The compaction fix becomes a no-op once upstream fixes that defect.
 VOICE_ENGINE_ALLOW_UNTESTED_UPSTREAM=1 skips the version check only; the code checks always run.
 """
 

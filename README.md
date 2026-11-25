@@ -1,20 +1,21 @@
 # Local Speech-to-Speech AI
 
-A real-time conversational AI system with fully local inference. You talk out loud in your browser and an assistant
-answers out loud, in real time, with every model running on your own Mac: speech recognition, the language model
-and speech synthesis. No cloud inference API is used, and after the initial model download it works offline. Your
-microphone audio is not recorded or stored.
+Real-time conversational AI with fully local inference on Apple Silicon.
 
-It is a cascaded pipeline (turn detection, speech recognition, language model, speech synthesis) built on Hugging
-Face speech-to-speech and MLX, not a single end-to-end speech model. It runs on Apple Silicon Macs only.
+Speak naturally through a browser or terminal, with local speech recognition, language model inference and speech
+synthesis. Built on Hugging Face speech-to-speech and MLX as a cascaded pipeline (turn detection, speech
+recognition, language model, speech synthesis); see [docs/architecture.md](docs/architecture.md).
+
+No cloud inference APIs required. Works offline after initial model downloads.
 
 ## Features
 
-- **Spoken conversation:** open-ended, low-latency voice chat with a general-purpose assistant.
-- **Turn-taking:** voice activity detection (Silero VAD) and end-of-turn detection (Smart Turn) decide when you
+- **Spoken conversation** with a general-purpose assistant.
+- **Turn detection:** voice activity detection (Silero VAD) and end-of-turn detection (Smart Turn) decide when you
   have finished speaking.
-- **Interruptions:** start talking while the assistant speaks and it stops at once. Its memory of the conversation then keeps
-  only the words you actually heard, so it follows you instead of repeating itself.
+- **Interruption handling:** start talking while the assistant speaks and playback stops immediately. The
+  conversation history then keeps only the complete sentences played before the interruption (estimated from the
+  playback position), so the assistant follows you instead of repeating itself.
 - **Live transcript** of both speakers, with partial text while you speak.
 - **Voice Studio:** choose one of six built-in voices, or create your own by recording or uploading a short
   reference (with the speaker's consent) or by describing a voice in words.
@@ -32,14 +33,12 @@ Face speech-to-speech and MLX, not a single end-to-end speech model. It runs on 
 | Speech synthesis | Qwen3-TTS 1.7B CustomVoice (built-in voices); optional Base (cloning) and VoiceDesign models |
 | Transport | OpenAI Realtime-style WebSocket on `127.0.0.1:8765`, 16 kHz PCM16 audio |
 
-How the parts work together: [docs/architecture.md](docs/architecture.md).
-
 ## Requirements
 
 | | Version | Needed for |
 |---|---|---|
-| Mac with Apple Silicon | a recent macOS release on a recent Apple Silicon chip; no other hardware is supported (see [Known limitations](#known-limitations)) | the voice engine (MLX) |
-| Memory | the engine itself uses about 8 GB, 11–14 GB with custom voices, on top of macOS and the browser | the voice engine |
+| Mac with Apple Silicon | a recent macOS release | the voice engine (MLX) |
+| Memory | about 8 GB for the engine, 11–14 GB with custom voices (measured), on top of macOS and the browser | the voice engine |
 | [uv](https://docs.astral.sh/uv/) | 0.13+ (it installs Python 3.12 itself) | the voice engine |
 | Node.js / npm | 22 LTS / 10 | the frontend |
 | Google Chrome | current | the browser (other browsers are untested) |
@@ -98,8 +97,8 @@ uv run voice-engine models download --profile quality
 ```
 
 Set `VOICE_ENGINE_MODELS_DIR` to keep models elsewhere. At run time the engine works offline and loads models only
-from that folder. Each model has its own license (listed by `models list` and in the manifest); for example, Parakeet is
-CC BY 4.0 and Qwen3.5 / Qwen3-TTS are Apache 2.0.
+from that folder. Each model has its own license (listed by `models list` and in the manifest); for example,
+Parakeet is CC BY 4.0 and Qwen3.5 / Qwen3-TTS are Apache 2.0.
 
 ## Run
 
@@ -126,8 +125,8 @@ Optional settings are listed in `frontend/.env.example` and `backend/voice-engin
 
 ## Use
 
-**Conversation.** Press *Start conversation* and talk. The assistant listens, thinks and answers; the waveform shows who is
-speaking. Interrupt it at any time. The microphone button mutes you; *End conversation* stops everything.
+**Conversation.** Press *Start conversation* and talk. The waveform shows who is speaking. Interrupt the assistant
+at any time. The microphone button mutes you; *End conversation* stops everything.
 *Transcript* in the header opens the transcript; *Clear* empties the displayed transcript only.
 
 **Voice Studio.** *Voice* in the header opens the panel:
@@ -139,25 +138,25 @@ speaking. Interrupt it at any time. The microphone button mutes you; *End conver
   has given permission. These need the optional models above; without them the panel says so.
 - **Manage:** rename or delete your voices.
 
-Saved voices are kept on your Mac in `data/voices/` (or `VOICE_ENGINE_VOICES_DIR`). The folder is created on first
-use, is git-ignored, and holds reference recordings: keep it private. A fresh install starts with no saved voices.
+## Privacy
+
+Conversation audio is streamed to the local engine and processed in memory; it is not saved, and transcripts are
+not logged by default. Voice Studio stores only the reference recordings you explicitly save, in `data/voices/` (or
+`VOICE_ENGINE_VOICES_DIR`). That folder is created on first use and git-ignored; keep it private.
 
 ## Known limitations
 
-- **Apple Silicon only:** this release is configured and tested only on Apple Silicon Macs. The setup script refuses
-  other platforms, and the inference pipeline uses Apple Silicon-specific configuration (MLX models and runtime,
-  Mac-optimized pipeline settings). NVIDIA GPUs, CPU-only execution, Linux, Windows and Intel Macs are not supported.
-  Other hardware backends may be feasible in future, but none has been integrated or validated.
+- **Apple Silicon only:** the setup script refuses other platforms, and the pipeline uses MLX models and
+  Mac-specific settings. Linux, Windows, Intel Macs, NVIDIA GPUs and CPU-only execution are not supported.
 - **One conversation at a time:** a second browser tab is refused while a conversation runs.
 - **Speakers and echo:** echo cancellation with laptop speakers has not been validated on real hardware. With
-  speakers, the assistant may hear itself and interrupt its own replies. Use headphones, or add `?halfDuplex` to the page URL
-  (your microphone is ignored while the assistant speaks, so you cannot interrupt it).
+  speakers, the assistant may hear itself and interrupt its own replies. Use headphones, or add `?halfDuplex` to the
+  page URL (the microphone is muted while the assistant speaks, which disables interruptions).
 - **English:** the prompts and test material are English; other languages are untested.
-- **Local network only:** the engine has an origin check but no authentication. Do not expose port 8765 to a
-  network.
+- **Localhost only:** the engine listens on `127.0.0.1` and checks Origin and Host headers, but has no
+  authentication. Do not expose port 8765 to a network.
 - **Voice Studio** cannot generate while a conversation runs, and a new default voice applies from the next
   conversation.
-- **Model downloads** come from Hugging Face; the first setup needs a network connection and about 9 GB.
 
 ## Documentation
 
@@ -166,7 +165,7 @@ use, is git-ignored, and holds reference recordings: keep it private. A fresh in
 | [TESTING.md](TESTING.md) | Test categories, commands, fixtures and troubleshooting |
 | [docs/architecture.md](docs/architecture.md) | Pipeline, WebSocket session, interruptions, Voice Studio, upstream patches |
 | [backend/voice-engine/README.md](backend/voice-engine/README.md) | Engine CLI, model storage, profiles, personas, Voice Studio API and storage |
-| [frontend/README.md](frontend/README.md) | Frontend commands, settings, source layout and design tokens |
+| [frontend/README.md](frontend/README.md) | Frontend commands, settings, source layout and behaviour notes |
 | [AGENTS.md](AGENTS.md) | Conventions and boundaries for AI coding agents |
 
 ## License

@@ -1,4 +1,4 @@
-"""Keep the conversation history true to what the user actually heard when they interrupt the assistant.
+"""Keep the conversation history consistent with what the user heard when they interrupt the assistant.
 
 The note text and the prompts call the user "the guest" and the assistant "the host".
 
@@ -9,7 +9,8 @@ interruption merged into the previous user message, and simply asks the question
 
 Only the client knows how much of a reply was played, so this fix lives on the client side and uses only the
 public Realtime protocol. When the assistant is interrupted, a short note goes into the history on the user's side,
-quoting the complete sentences the user heard, or saying they were cut off before finishing one:
+quoting the complete sentences the user heard, or saying they were cut off before finishing one. What was heard is
+estimated from the playback position (see `InterruptionHistory.heard_text`):
 
     (The guest interrupts you. They heard you say: "That's a fascinating tension." Then they cut you off.)
 
@@ -63,7 +64,8 @@ def _b64_len(data: str) -> int:
 
 
 def heard_prefix(text: str, fraction: float) -> str:
-    """The words of `text` spoken by the time `fraction` of it has been played (rounded down to whole words)."""
+    """The words of `text` spoken by the time `fraction` of it has been played, assuming a uniform speaking rate
+    (rounded down to whole words)."""
     if fraction >= 0.98:
         return text.strip()
     cut = int(len(text) * max(0.0, fraction))

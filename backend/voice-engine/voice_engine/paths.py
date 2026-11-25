@@ -1,8 +1,7 @@
 """Project locations and the offline runtime environment.
 
-The models root is `<project>/models` unless VOICE_ENGINE_MODELS_DIR is set. At run time every model is loaded from
-there by explicit path; the Hugging Face cache points at an empty directory inside the models root and offline mode is
-on, so a missing model fails loudly instead of being fetched or found in another cache.
+Models load by explicit path from the models root (`<project>/models`, or VOICE_ENGINE_MODELS_DIR). Offline mode is
+on and HF_HOME is an empty directory, so a missing model fails instead of being fetched or found in another cache.
 """
 
 from __future__ import annotations

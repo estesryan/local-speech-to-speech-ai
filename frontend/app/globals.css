@@ -2,15 +2,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-/*
- * Design tokens:
- *   background gradient  #182333 -> #111821 (diagonal)
- *   wordmark             #ffffff, Inter 700, letter-spacing -1.5 at 45px (about -0.033em)
- *   status dot           #7DDCC9
- *   status label         #B5C1CE, Inter 400
- *   waveform bars        #78DDC8, fully rounded, about 0.53 bar-to-pitch ratio
- * Everything else (surfaces, borders, error) is derived from these at low intensity.
- */
+/* Design tokens. Surfaces, borders and the error colour are derived from these at low intensity. */
 :root {
   color-scheme: dark;
 
@@ -99,7 +91,7 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    /* the brand's diagonal navy gradient */
+    /* diagonal navy background gradient */
     background: linear-gradient(
         141deg,
         var(--app-navy) 0%,

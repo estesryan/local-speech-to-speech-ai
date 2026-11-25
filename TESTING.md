@@ -1,23 +1,23 @@
 # Testing
 
-All test instructions for this project. Install the project first ([README](README.md#install)): `scripts/setup.sh` creates
-the engine's environment, including pytest, and `npm ci` installs the frontend's test tools.
+Install the project first ([README](README.md#install)): `scripts/setup.sh` creates the engine's environment,
+including pytest, and `npm ci` installs the frontend's test tools.
 
 ## Quick checks
 
-These need no models, GPU or running engine:
+These need no model weights, GPU inference or running engine. From the repository root:
 
 ```bash
-cd backend/voice-engine && uv run pytest                          # engine unit tests
-cd frontend && npm test && npm run typecheck && npm run lint      # frontend unit tests, types, Biome
+(cd backend/voice-engine && uv run pytest)                         # engine unit tests
+(cd frontend && npm test && npm run typecheck && npm run lint)     # frontend unit tests, types, Biome
 ```
 
 ## Test categories
 
 | Category | Command | Needs |
 |---|---|---|
-| Engine unit | `uv run pytest` (in `backend/voice-engine`) | nothing; a few profile tests run only when the `fast` models are installed |
-| Engine integration | `uv run pytest -m integration` | Apple Silicon, the `fast` models, port 8765 free; about 3 minutes |
+| Engine unit | `uv run pytest` (in `backend/voice-engine`) | Apple Silicon: the locked environment includes MLX packages that some tests import. No model weights; a few profile tests run only when the `fast` models are installed |
+| Engine integration | `uv run pytest -m integration` | Apple Silicon, the `fast` models (GPU inference), port 8765 free; about 3 minutes |
 | Frontend unit and component | `npm test` (in `frontend`) | nothing (Vitest, jsdom, fake media and engine) |
 | Types and lint | `npm run typecheck`, `npm run lint` | nothing |
 | Browser end-to-end | `npm run test:e2e` (in `frontend`) | Google Chrome, a running engine on port 8765 with models |
@@ -43,7 +43,8 @@ interruptions, but not a physical microphone, speakers or echo cancellation.
 - Tests are skipped when no engine is listening on port 8765.
 - `voice-studio.spec.ts` creates a voice in the running engine's voice store (and deletes it afterwards). It is
   skipped unless you start the engine with a temporary store and confirm it:
-  `VOICE_ENGINE_VOICES_DIR=$(mktemp -d) uv run voice-engine serve`, then `E2E_TEMP_VOICES=1 npm run test:e2e`.
+  `VOICE_ENGINE_VOICES_DIR=$(mktemp -d) uv run voice-engine serve` in `backend/voice-engine`, then
+  `E2E_TEMP_VOICES=1 npm run test:e2e` in `frontend`.
 
 `bench/realtime_bench.py` is the Realtime client the integration tests use. Its own benchmark sessions read inputs
 from `bench-data/`, which is not included in the repository.

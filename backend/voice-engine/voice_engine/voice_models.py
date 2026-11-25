@@ -2,10 +2,11 @@
 
 - Presets use the pipeline's own CustomVoice model (the TTS handler registers itself here at setup), so previews
   and live speech share one copy of the weights.
-- User voices are cloned live by the Base model, loaded on first use and then kept: it serves every turn of a
-  Conversation that uses a custom voice.
-- VoiceDesign (creating a voice from a description) and Parakeet (transcribing a new reference) are only needed
-  while a voice is being created: they are loaded for that request and released afterwards.
+- User voices are cloned live by the Base model, loaded on first use and then kept for the life of the process: it
+  serves every turn of a conversation that uses a custom voice.
+- VoiceDesign (creating a voice from a description) is loaded for each design request and released afterwards.
+- Transcription of a new reference reuses the pipeline's Parakeet model (MLX backend; the STT handler registers
+  itself in patches/voice_studio.py); without it, a Parakeet model is loaded for the request and released.
 
 All generation holds upstream's process-wide MLX lock, so a preview never runs at the same time as live speech.
 """

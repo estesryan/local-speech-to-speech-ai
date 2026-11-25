@@ -1,13 +1,5 @@
-"""Voice Studio HTTP API, served by the voice engine next to the Realtime WebSocket (patches/voice_studio.py).
-
-    GET    /v1/voices                      voices, Conversation default, capabilities, whether a session is live
-    POST   /v1/voices/preview              {voice_id | candidate, text} -> audio/wav (real synthesis)
-    POST   /v1/voices?name=&method=&consent=true   body: WAV reference (recorded | uploaded)
-    POST   /v1/voices/design/candidates    {description, count} -> candidate voices (base64 WAV)
-    POST   /v1/voices/design               {token, index, name} -> saves a candidate
-    PATCH  /v1/voices/{id}                 {name}
-    DELETE /v1/voices/{id}
-    PUT    /v1/voices/default              {voice_id}
+"""Voice Studio HTTP API under /v1/voices, served by the voice engine next to the Realtime WebSocket
+(patches/voice_studio.py). The endpoints are listed in the engine README.
 
 Generation (preview, transcription, design) is refused with 409 while a conversation is live, and a conversation
 is refused while generation runs (voice_models.generation): they would compete for the GPU. Only the browser origins

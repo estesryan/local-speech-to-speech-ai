@@ -5,7 +5,10 @@
 
 export const ENGINE_SAMPLE_RATE = 16000;
 
-/** Downsample by averaging each output sample's input window (a simple low-pass that avoids aliasing). */
+/**
+ * Downsample by averaging each output sample's input window. The box average is a crude low-pass filter: it
+ * reduces aliasing but does not eliminate it.
+ */
 export function downsample(
   input: Float32Array,
   inputRate: number,
@@ -31,7 +34,11 @@ export function downsample(
   return out;
 }
 
-/** A streaming downsampler: keeps the fractional remainder between chunks so no samples are lost or doubled. */
+/**
+ * A streaming downsampler that carries unconsumed input samples over to the next chunk. Output is exact when each
+ * chunk spans a whole number of output samples (the capture worklet's 40 ms blocks do at standard rates); with
+ * other chunk sizes and a non-integer rate ratio, up to one output sample per chunk can be lost.
+ */
 export class StreamingDownsampler {
   private pending = new Float32Array(0);
 

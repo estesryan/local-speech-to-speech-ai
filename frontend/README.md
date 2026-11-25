@@ -59,11 +59,5 @@ e2e/                     Playwright tests in Chrome with a fake microphone, agai
 
 ## Design
 
-The design tokens live in `app/globals.css`:
-
-- navy gradient `#182333 → #111821`;
-- white Inter-bold wordmark with tight tracking;
-- mint status dot `#7DDCC9` with slate label `#B5C1CE`;
-- rounded mint bars `#78DDC8`.
-
-The resting waveform is a 52-bar signature silhouette (`components/studio/waveform.tsx`).
+Colour and easing tokens live in `app/globals.css`. The resting waveform is a fixed 52-bar silhouette
+(`components/studio/waveform.tsx`); live levels are tapered by a smoothed version of it.
