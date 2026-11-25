@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 import soundfile as sf
 
-from numa_voice.voices import (FALLBACK_VOICE, SAMPLE_RATE, VoiceError, VoiceNotFound, VoiceStore, prepare_reference,
+from voice_engine.voices import (FALLBACK_VOICE, SAMPLE_RATE, VoiceError, VoiceNotFound, VoiceStore, prepare_reference,
                                wav_bytes)
 
 

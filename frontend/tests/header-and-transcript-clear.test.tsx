@@ -102,7 +102,7 @@ describe("clearing the transcript", () => {
           type: "entry.started",
           entryId: "host:r2",
           speaker: "host",
-          speakerName: "Numa",
+          speakerName: "Assistant",
           atMs: 2000,
         },
         {

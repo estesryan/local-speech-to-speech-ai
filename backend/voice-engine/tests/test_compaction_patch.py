@@ -4,7 +4,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from numa_voice.patches import TESTED_UPSTREAM, check_upstream_version, compaction
+from voice_engine.patches import TESTED_UPSTREAM, check_upstream_version, compaction
 
 
 class FakeTokenizer:
@@ -66,6 +66,6 @@ def test_untested_upstream_version_is_refused(monkeypatch):
     import speech_to_speech
 
     monkeypatch.setattr(speech_to_speech, "__version__", "9.9.9")
-    monkeypatch.delenv("NUMA_VOICE_ALLOW_UNTESTED_UPSTREAM", raising=False)
+    monkeypatch.delenv("VOICE_ENGINE_ALLOW_UNTESTED_UPSTREAM", raising=False)
     with pytest.raises(RuntimeError, match="Re-validate"):
         check_upstream_version()

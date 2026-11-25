@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Idempotent developer setup for the Numa voice engine. Safe to re-run; it only does what is missing.
+# Idempotent developer setup for the local voice engine. Safe to re-run; it only does what is missing.
 #
 #   backend/voice-engine/scripts/setup.sh            # fast profile (Qwen3.5-4B, default)
 #   backend/voice-engine/scripts/setup.sh quality    # also the optional 9B profile's models
@@ -19,20 +19,20 @@ fi
 # 2. Python 3.12 environment from uv.lock (uv installs Python 3.12 itself if needed)
 uv sync --frozen
 
-# 3. Models under <project>/models (or $NUMA_MODELS_DIR), pinned revisions, only this profile's.
-#    If a Numa Hugging Face cache (~/.cache/numa/huggingface) exists, reuse it first (APFS clone, no download);
-#    download whatever is still missing.
-if [[ -d "$HOME/.cache/numa/huggingface/hub" ]]; then
-  uv run numa-voice models migrate --profile "$PROFILE" || true
+# 3. Models under <project>/models (or $VOICE_ENGINE_MODELS_DIR), pinned revisions, only this profile's.
+#    If a local Hugging Face cache (~/.cache/voice-engine/huggingface) exists, reuse it first (APFS clone, no
+#    download); download whatever is still missing.
+if [[ -d "$HOME/.cache/voice-engine/huggingface/hub" ]]; then
+  uv run voice-engine models migrate --profile "$PROFILE" || true
 fi
-uv run numa-voice models download --profile "$PROFILE"
+uv run voice-engine models download --profile "$PROFILE"
 
 # 4. Integrity (sizes + SHA-256 from the manifest) and upstream configuration validation
-uv run numa-voice models verify --profile "$PROFILE"
+uv run voice-engine models verify --profile "$PROFILE"
 
 # 5. Unit tests (no GPU needed; integration tests: uv run pytest -m integration)
 uv run pytest -q
 
 echo
 echo "Ready. Start a conversation (headphones recommended):"
-echo "  cd backend/voice-engine && uv run numa-voice run --profile ${PROFILE/all/fast}"
+echo "  cd backend/voice-engine && uv run voice-engine run --profile ${PROFILE/all/fast}"

@@ -174,7 +174,7 @@ export class VoiceSession implements VoiceSessionHandle {
       case "response.created":
         this.activeResponse = true;
         break;
-      case "numa.session": {
+      case "voice_engine.session": {
         const voice = event.voice as SessionInfo["voice"] | undefined;
         if (voice) {
           this.callbacks.onSessionInfo?.({

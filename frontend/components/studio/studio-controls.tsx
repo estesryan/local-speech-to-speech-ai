@@ -45,9 +45,9 @@ export function StudioControls({
         disabled={!canMute}
         onClick={onToggleMute}
         className={cn(
-          "size-14 rounded-full border-border bg-transparent text-foreground shadow-none transition-[background-color,border-color,transform] duration-200 ease-numa active:scale-[0.96] [&_svg:not([class*='size-'])]:size-5",
-          "hover:border-numa-slate/40 hover:bg-white/[0.04]",
-          muted && "border-numa-slate/50 bg-white/[0.06] text-numa-slate",
+          "size-14 rounded-full border-border bg-transparent text-foreground shadow-none transition-[background-color,border-color,transform] duration-200 ease-app active:scale-[0.96] [&_svg:not([class*='size-'])]:size-5",
+          "hover:border-app-slate/40 hover:bg-white/[0.04]",
+          muted && "border-app-slate/50 bg-white/[0.06] text-app-slate",
         )}
       >
         {muted ? <MicOff aria-hidden="true" /> : <Mic aria-hidden="true" />}
@@ -58,7 +58,7 @@ export function StudioControls({
           type="button"
           variant="outline"
           onClick={onEnd}
-          className="h-14 min-w-44 rounded-full px-6 sm:min-w-56 sm:px-8 border-border bg-transparent text-[15px] font-medium text-foreground shadow-none transition-[background-color,border-color,color,transform] duration-200 ease-numa hover:border-numa-coral/60 hover:bg-numa-coral/10 hover:text-numa-coral active:scale-[0.98] [&_svg:not([class*='size-'])]:size-4"
+          className="h-14 min-w-44 rounded-full px-6 sm:min-w-56 sm:px-8 border-border bg-transparent text-[15px] font-medium text-foreground shadow-none transition-[background-color,border-color,color,transform] duration-200 ease-app hover:border-app-coral/60 hover:bg-app-coral/10 hover:text-app-coral active:scale-[0.98] [&_svg:not([class*='size-'])]:size-4"
         >
           <Square aria-hidden="true" className="fill-current" />
           {endLabel}
@@ -67,7 +67,7 @@ export function StudioControls({
         <Button
           type="button"
           onClick={onStart}
-          className="h-14 min-w-44 rounded-full px-6 sm:min-w-56 sm:px-8 bg-numa-mint text-[15px] font-semibold text-primary-foreground shadow-[0_0_0_1px_rgba(125,220,201,0.2),0_8px_30px_-12px_rgba(125,220,201,0.45)] transition-[background-color,box-shadow,transform] duration-200 ease-numa hover:bg-[#8fe4d2] active:scale-[0.98] focus-visible:ring-offset-2 focus-visible:ring-offset-background [&_svg:not([class*='size-'])]:size-5"
+          className="h-14 min-w-44 rounded-full px-6 sm:min-w-56 sm:px-8 bg-app-mint text-[15px] font-semibold text-primary-foreground shadow-[0_0_0_1px_rgba(125,220,201,0.2),0_8px_30px_-12px_rgba(125,220,201,0.45)] transition-[background-color,box-shadow,transform] duration-200 ease-app hover:bg-[#8fe4d2] active:scale-[0.98] focus-visible:ring-offset-2 focus-visible:ring-offset-background [&_svg:not([class*='size-'])]:size-5"
         >
           <AudioLines aria-hidden="true" />
           {status === "ended" || status === "error"
@@ -81,7 +81,7 @@ export function StudioControls({
         aria-hidden="true"
       >
         {status === "connecting" && (
-          <LoaderCircle className="size-5 animate-spin text-numa-slate motion-reduce:animate-none" />
+          <LoaderCircle className="size-5 animate-spin text-app-slate motion-reduce:animate-none" />
         )}
       </span>
     </div>

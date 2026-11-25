@@ -17,14 +17,14 @@ export type WaveformState =
   | "muted"
   | "error";
 
-/** Bar heights of the Numa waveform signature (52 bars), the resting silhouette. */
+/** Bar heights of the waveform signature (52 bars), the resting silhouette. */
 export const SIGNATURE = [
   29, 37, 48, 55, 46, 47, 69, 79, 75, 54, 88, 111, 111, 69, 99, 139, 117, 80,
   120, 166, 180, 130, 93, 149, 200, 146, 95, 159, 196, 149, 90, 144, 172, 131,
   82, 129, 143, 113, 67, 101, 113, 88, 58, 61, 80, 77, 59, 45, 59, 51, 45, 39,
 ].map((h) => h / 200);
 
-/** Spatial taper for live levels: a smoothed signature envelope, so live audio keeps the Numa silhouette. */
+/** Spatial taper for live levels: a smoothed signature envelope, so live audio keeps the signature silhouette. */
 const TAPER = SIGNATURE.map((_, i) => {
   let sum = 0;
   let n = 0;
@@ -39,7 +39,7 @@ const TAPER = SIGNATURE.map((_, i) => {
   return sum / n;
 }).map((v, _, all) => 0.32 + (0.68 * v) / Math.max(...all));
 
-const BAR_RATIO = 0.53; // bar width / pitch of the Numa waveform
+const BAR_RATIO = 0.53; // bar width / pitch of the waveform
 const SAMPLE_MS = 50; // one bar of live history per 50 ms: the waveform spans about 2.6 s
 const SAMPLE_MS_REDUCED = 150;
 
@@ -56,14 +56,14 @@ const LABELS: Record<WaveformState, string> = {
   idle: "Waveform at rest",
   listening: "Live microphone level",
   processing: "Processing indicator (not audio)",
-  speaking: "Numa speech level",
+  speaking: "Assistant speech level",
   muted: "Microphone muted",
   error: "Waveform unavailable",
 };
 
 export interface WaveformProps {
   state: WaveformState;
-  /** Real audio levels for listening (microphone) or speaking (Numa's output). Never synthesized. */
+  /** Real audio levels for listening (microphone) or speaking (the assistant's output). Never synthesized. */
   levels?: LevelSource | null;
   /** Override the user's motion preference (tests, previews). */
   reducedMotion?: boolean;

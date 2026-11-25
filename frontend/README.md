@@ -1,4 +1,4 @@
-# Numa frontend
+# Frontend
 
 The browser app: the Conversation page (`/`) and the Voice panel. It talks to the local voice engine over its
 Realtime WebSocket and Voice Studio API. Installation and running are in the [root README](../README.md#install),
@@ -22,9 +22,9 @@ the only browser origins the engine accepts by default.
 
 | Setting | Effect |
 |---|---|
-| `NEXT_PUBLIC_NUMA_VOICE_URL` | engine WebSocket (default `ws://127.0.0.1:8765/v1/realtime`) |
-| `NEXT_PUBLIC_NUMA_VOICE=off` | no engine: microphone-only preview with the development state simulation |
-| `?halfDuplex` in the page URL | send silence while Numa speaks (for speakers if echo cancellation fails) |
+| `NEXT_PUBLIC_VOICE_ENGINE_URL` | engine WebSocket (default `ws://127.0.0.1:8765/v1/realtime`) |
+| `NEXT_PUBLIC_VOICE_ENGINE=off` | no engine: microphone-only preview with the development state simulation |
+| `?halfDuplex` in the page URL | send silence while the assistant speaks (for speakers if echo cancellation fails) |
 
 The environment variables are listed in `.env.example`; copy it to `.env.local` to change them.
 
@@ -54,7 +54,7 @@ e2e/                     Playwright tests in Chrome with a fake microphone, agai
   colour the reference. They go only to the local engine and are never played back from a URL.
 - **Reduced motion:** the processing sweep stops, live levels update in discrete steps, and pulsing indicators are
   disabled.
-- **Without an engine** (`NEXT_PUBLIC_NUMA_VOICE=off`), the transcript panel says so instead of showing anything
+- **Without an engine** (`NEXT_PUBLIC_VOICE_ENGINE=off`), the transcript panel says so instead of showing anything
   derived from the microphone.
 
 ## Design
@@ -66,4 +66,4 @@ The design tokens live in `app/globals.css`:
 - mint status dot `#7DDCC9` with slate label `#B5C1CE`;
 - rounded mint bars `#78DDC8`.
 
-The resting waveform is Numa's 52-bar signature silhouette (`components/studio/waveform.tsx`).
+The resting waveform is a 52-bar signature silhouette (`components/studio/waveform.tsx`).

@@ -1,7 +1,7 @@
 /**
  * Transcript events, produced from the voice engine's Realtime events by lib/realtime/transcript.ts.
  *
- * Times are milliseconds from the start of the session. The "host" speaker is the assistant (Numa).
+ * Times are milliseconds from the start of the session. The "host" speaker is the assistant.
  */
 
 import { z } from "zod";

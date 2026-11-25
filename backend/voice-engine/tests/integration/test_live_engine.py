@@ -14,8 +14,8 @@ import pytest
 import realtime_bench as rb
 import websockets
 
-from numa_voice.interruption import NOTE_PREFIX
-from numa_voice.paths import models_root
+from voice_engine.interruption import NOTE_PREFIX
+from voice_engine.paths import models_root
 
 pytestmark = pytest.mark.integration
 
@@ -79,9 +79,11 @@ def test_a_session_chooses_its_persona_and_cannot_override_the_prompt(engine):
             return reply.lower()
 
     offset = engine.log_offset()
-    assert "numa" in asyncio.run(ask("?persona=numa-assistant"))
+    # the engine was launched with ren-test: only the requested persona's prompt answers, never the client's
+    reply = asyncio.run(ask("?persona=assistant"))
+    assert not re.search(r"\bren\b", reply) and "blackbeard" not in reply and "pirate" not in reply
     reply = asyncio.run(ask("?persona=ren-test"))
-    assert "blackbeard" not in reply and "pirate" not in reply
+    assert re.search(r"\bren\b", reply) and "blackbeard" not in reply and "pirate" not in reply
     assert asyncio.run(open_with_origin(engine.url + "?persona=nobody", None)) == 403
     assert "Removed client-supplied session instructions" in engine.log_since(offset)
 

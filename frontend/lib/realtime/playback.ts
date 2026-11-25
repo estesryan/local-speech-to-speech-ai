@@ -7,7 +7,7 @@ import { rms, rmsToLevel } from "@/lib/audio/levels";
 import { ENGINE_SAMPLE_RATE } from "./codec";
 
 /**
- * Sample accounting, the twin of TrackingPlaybackBuffer in numa_voice/patches/audio_client.py. Every appended
+ * Sample accounting, the twin of TrackingPlaybackBuffer in voice_engine/patches/audio_client.py. Every appended
  * sample is eventually consumed: played, or dropped by clear(). A reply's played position is measured from its
  * first sample, so it stays right after earlier replies were cleared.
  */

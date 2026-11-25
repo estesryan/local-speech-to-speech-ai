@@ -1,4 +1,4 @@
-"""Hook Numa's interruption fix into upstream's standalone audio client (`local` and `talk` commands).
+"""Hook the interruption fix into upstream's standalone audio client (`local` and `talk` commands).
 
 Two classes in `speech_to_speech.api.openai_realtime.audio_client` are replaced with subclasses:
 
@@ -21,7 +21,7 @@ from speech_to_speech.api.openai_realtime import audio_client as ac
 from ..interruption import InterruptionHistory
 from . import UpstreamIncompatible, require, require_source
 
-logger = logging.getLogger("numa_voice.interruption")
+logger = logging.getLogger("voice_engine.interruption")
 
 
 def _check_upstream() -> None:
@@ -37,7 +37,7 @@ def _check_upstream() -> None:
     # the buffer must be created right before the coordinator, and the coordinator must see each event first
     if not (session.index("playback = PlaybackBuffer(") < session.index("_ToolCallCoordinator(conn, config)")
             and session.index("tool_calls.handle_event(event)") < session.index("handle_server_event(")):
-        raise UpstreamIncompatible("_run_audio_session changed order upstream; re-validate numa_voice/patches/")
+        raise UpstreamIncompatible("_run_audio_session changed order upstream; re-validate voice_engine/patches/")
 
 
 _check_upstream()

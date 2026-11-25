@@ -17,7 +17,7 @@ export const CLEAR_TRANSCRIPT_PROMPT =
   "Clear the transcript? This only clears what is shown here; the conversation continues.";
 
 /**
- * Live transcript of both speakers, from the voice engine's recognition and Numa's reply text. Without a
+ * Live transcript of both speakers, from the voice engine's recognition and the assistant's reply text. Without a
  * connected engine the panel says so instead of showing anything derived from the microphone.
  */
 export function TranscriptPanel({
@@ -42,7 +42,7 @@ export function TranscriptPanel({
           Transcript
         </h2>
         <div className="flex items-baseline gap-3">
-          <span className="text-xs text-numa-slate/60">
+          <span className="text-xs text-app-slate/60">
             {entries.length > 0 ? `${entries.length} turns` : "Live"}
           </span>
           {onClear && entries.length > 0 && (
@@ -53,7 +53,7 @@ export function TranscriptPanel({
                   onClear();
                 }
               }}
-              className="rounded-full text-xs text-numa-slate/60 transition-colors duration-200 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="rounded-full text-xs text-app-slate/60 transition-colors duration-200 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               Clear
             </button>
@@ -67,13 +67,13 @@ export function TranscriptPanel({
             {[10, 16, 12, 20, 14].map((h) => (
               <span
                 key={h}
-                className="w-1 rounded-full bg-numa-slate/25"
+                className="w-1 rounded-full bg-app-slate/25"
                 style={{ height: h }}
               />
             ))}
           </div>
           <p className="text-sm text-foreground/90">No transcript yet.</p>
-          <p className="max-w-[34ch] text-sm leading-relaxed text-numa-slate/75">
+          <p className="max-w-[34ch] text-sm leading-relaxed text-app-slate/75">
             {available
               ? "Both sides of the conversation will appear here as they are spoken."
               : "Speech recognition isn't connected. Start a session with the local voice engine running, and both sides of the conversation will appear here as they are spoken."}
@@ -91,14 +91,14 @@ export function TranscriptPanel({
                   className={cn(
                     "font-semibold",
                     entry.speaker === "host"
-                      ? "text-numa-mint"
+                      ? "text-app-mint"
                       : "text-foreground",
                   )}
                 >
                   {entry.speakerName ??
-                    (entry.speaker === "host" ? "Numa" : "You")}
+                    (entry.speaker === "host" ? "Assistant" : "You")}
                 </span>
-                <time className="tabular-nums text-numa-slate/60">
+                <time className="tabular-nums text-app-slate/60">
                   {formatDuration(entry.startedAtMs)}
                 </time>
               </div>
@@ -106,7 +106,7 @@ export function TranscriptPanel({
                 {entry.text}
                 {entry.interrupted && (
                   <>
-                    <span aria-hidden="true" className="text-numa-slate/60">
+                    <span aria-hidden="true" className="text-app-slate/60">
                       {entry.text ? " —" : "—"}
                     </span>
                     <span className="sr-only"> (interrupted)</span>
@@ -116,7 +116,7 @@ export function TranscriptPanel({
                   <>
                     <span
                       aria-hidden="true"
-                      className="ml-0.5 inline-block h-[1em] w-[2px] translate-y-[2px] bg-numa-mint motion-safe:animate-pulse"
+                      className="ml-0.5 inline-block h-[1em] w-[2px] translate-y-[2px] bg-app-mint motion-safe:animate-pulse"
                     />
                     <span className="sr-only"> (still speaking)</span>
                   </>

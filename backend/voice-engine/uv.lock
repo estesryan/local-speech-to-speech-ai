@@ -725,6 +725,29 @@ wheels = [
 ]
 
 [[package]]
+name = "local-voice-engine"
+version = "0.2.0"
+source = { editable = "." }
+dependencies = [
+    { name = "pyyaml" },
+    { name = "speech-to-speech" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "pytest" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "pyyaml", specifier = ">=6,<7" },
+    { name = "speech-to-speech", specifier = "==1.1.0" },
+]
+
+[package.metadata.requires-dev]
+dev = [{ name = "pytest", specifier = ">=8" }]
+
+[[package]]
 name = "markdown-it-py"
 version = "4.2.0"
 source = { registry = "https://pypi.org/simple" }
@@ -919,29 +942,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/e0/e6/fe51d2bb1a3b446f5
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b6/6d/ebd2af4640b12168fdf0cb74b6118df2f32a2f62ec7e0c06fbfd80706639/nltk-3.10.3-py3-none-any.whl", hash = "sha256:ff9598a8e20518ee0d557745890cc4435b9578489e2dcbc69c4f81fa060caf7c", size = 1798643, upload-time = "2026-08-12T23:44:13.478Z" },
 ]
-
-[[package]]
-name = "numa-voice-engine"
-version = "0.2.0"
-source = { editable = "." }
-dependencies = [
-    { name = "pyyaml" },
-    { name = "speech-to-speech" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "pytest" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "pyyaml", specifier = ">=6,<7" },
-    { name = "speech-to-speech", specifier = "==1.1.0" },
-]
-
-[package.metadata.requires-dev]
-dev = [{ name = "pytest", specifier = ">=8" }]
 
 [[package]]
 name = "numba"

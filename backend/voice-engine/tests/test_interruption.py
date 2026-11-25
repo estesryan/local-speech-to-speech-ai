@@ -5,7 +5,7 @@ import re
 
 import pytest
 
-from numa_voice.interruption import (ENGINE_INSTRUCTIONS, NOTE_FEW_WORDS, NOTE_NOTHING_HEARD, NOTE_PREFIX,
+from voice_engine.interruption import (ENGINE_INSTRUCTIONS, NOTE_FEW_WORDS, NOTE_NOTHING_HEARD, NOTE_PREFIX,
                                      InterruptionHistory, heard_prefix, whole_sentences)
 
 RATE = 16000

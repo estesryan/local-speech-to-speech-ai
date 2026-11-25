@@ -20,11 +20,11 @@ import type { RecorderEnvironment } from "@/lib/voices/recorder";
 import { VoiceCreate } from "./voice-create";
 
 export const chip =
-  "inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs text-numa-slate transition-colors duration-200 hover:border-numa-slate/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-40";
+  "inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs text-app-slate transition-colors duration-200 hover:border-app-slate/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-40";
 export const primaryChip =
-  "inline-flex items-center gap-1.5 rounded-full bg-numa-mint px-4 py-2 text-xs font-semibold text-primary-foreground transition-colors duration-200 hover:bg-[#8fe4d2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-40";
+  "inline-flex items-center gap-1.5 rounded-full bg-app-mint px-4 py-2 text-xs font-semibold text-primary-foreground transition-colors duration-200 hover:bg-[#8fe4d2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-40";
 export const field =
-  "w-full rounded-xl border border-border bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-numa-slate/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+  "w-full rounded-xl border border-border bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-app-slate/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
 const METHOD_LABEL: Record<string, string> = {
   preset: "Built-in",
@@ -52,7 +52,7 @@ export interface VoicePanelProps {
   className?: string;
 }
 
-/** Voice Studio: choose, preview, create and manage the voice Numa speaks with in conversations. */
+/** Voice Studio: choose, preview, create and manage the voice the assistant speaks with in conversations. */
 export function VoicePanel({
   id,
   sessionActive,
@@ -128,24 +128,24 @@ export function VoicePanel({
         >
           Voice
         </h2>
-        <span className="text-xs text-numa-slate/60">Conversation</span>
+        <span className="text-xs text-app-slate/60">Conversation</span>
       </header>
 
       <div className="flex flex-1 flex-col gap-7 overflow-y-auto px-6 pb-8">
         {studio.error && (
           <p
             role="alert"
-            className="rounded-xl border border-numa-coral/30 bg-numa-coral/[0.07] px-3 py-2 text-xs text-foreground"
+            className="rounded-xl border border-app-coral/30 bg-app-coral/[0.07] px-3 py-2 text-xs text-foreground"
           >
             {studio.error}
           </p>
         )}
         {studio.notice && (
-          <output className="text-xs text-numa-mint">{studio.notice}</output>
+          <output className="text-xs text-app-mint">{studio.notice}</output>
         )}
 
         <div className="flex flex-col gap-2">
-          <h3 className="text-xs font-medium tracking-[0.08em] text-numa-slate uppercase">
+          <h3 className="text-xs font-medium tracking-[0.08em] text-app-slate uppercase">
             Current voice
           </h3>
           {current ? (
@@ -154,24 +154,24 @@ export function VoicePanel({
                 <p className="truncate text-[15px] text-foreground">
                   {current.name}
                 </p>
-                <p className="text-xs text-numa-slate/70">
+                <p className="text-xs text-app-slate/70">
                   {METHOD_LABEL[current.method]}
                 </p>
               </div>
               {previewButton(current)}
             </div>
           ) : (
-            <p className="text-sm text-numa-slate/75">
+            <p className="text-sm text-app-slate/75">
               {studio.loading ? "Loading voices…" : "Voices unavailable."}
             </p>
           )}
           {state?.default_problem && (
-            <p className="text-xs text-numa-coral">
+            <p className="text-xs text-app-coral">
               Using {current?.name}: {state.default_problem}.
             </p>
           )}
           {sessionActive && sessionVoice && (
-            <p className="text-xs leading-relaxed text-numa-slate/75">
+            <p className="text-xs leading-relaxed text-app-slate/75">
               This conversation speaks as {sessionVoice.name}
               {sessionVoice.fallback ? ` (${sessionVoice.fallback})` : ""}.
               {current && current.id !== sessionVoice.id
@@ -180,14 +180,14 @@ export function VoicePanel({
             </p>
           )}
           {generationBlocked && (
-            <p className="text-xs text-numa-slate/60">
+            <p className="text-xs text-app-slate/60">
               End the conversation to preview or create voices.
             </p>
           )}
         </div>
 
         <label className="flex flex-col gap-2">
-          <span className="text-xs font-medium tracking-[0.08em] text-numa-slate uppercase">
+          <span className="text-xs font-medium tracking-[0.08em] text-app-slate uppercase">
             Preview text
           </span>
           <textarea
@@ -200,7 +200,7 @@ export function VoicePanel({
         </label>
 
         <div className="flex flex-col gap-3">
-          <h3 className="text-xs font-medium tracking-[0.08em] text-numa-slate uppercase">
+          <h3 className="text-xs font-medium tracking-[0.08em] text-app-slate uppercase">
             Saved voices
           </h3>
           <ul className="flex flex-col gap-3">
@@ -246,30 +246,30 @@ export function VoicePanel({
                           "truncate text-sm",
                           voice.available
                             ? "text-foreground"
-                            : "text-numa-slate/60",
+                            : "text-app-slate/60",
                         )}
                       >
                         {voice.name}
                       </span>
-                      <span className="shrink-0 text-xs text-numa-slate/60">
+                      <span className="shrink-0 text-xs text-app-slate/60">
                         {METHOD_LABEL[voice.method]}
                       </span>
                     </div>
                   )}
                   {voice.description && (
-                    <p className="text-xs text-numa-slate/70">
+                    <p className="text-xs text-app-slate/70">
                       {voice.description}
                     </p>
                   )}
                   {voice.problem && (
-                    <p className="text-xs text-numa-coral">{voice.problem}</p>
+                    <p className="text-xs text-app-coral">{voice.problem}</p>
                   )}
                   <div className="flex flex-wrap gap-2">
                     {previewButton(voice)}
                     {isDefault ? (
-                      <span className="inline-flex items-center gap-1.5 px-1 py-1.5 text-xs text-numa-mint">
+                      <span className="inline-flex items-center gap-1.5 px-1 py-1.5 text-xs text-app-mint">
                         <Check aria-hidden="true" className="size-3.5" />
-                        Numa default
+                        Default voice
                       </span>
                     ) : (
                       <button
@@ -278,7 +278,7 @@ export function VoicePanel({
                         disabled={!voice.available || studio.pending !== null}
                         onClick={() => void studio.setDefault(voice.id)}
                       >
-                        Set as Numa default
+                        Set as default voice
                       </button>
                     )}
                     {!voice.builtin && (
@@ -300,7 +300,7 @@ export function VoicePanel({
                           type="button"
                           className={cn(
                             chip,
-                            "hover:border-numa-coral/60 hover:text-numa-coral",
+                            "hover:border-app-coral/60 hover:text-app-coral",
                           )}
                           aria-label={`Delete ${voice.name}`}
                           disabled={studio.pending !== null}

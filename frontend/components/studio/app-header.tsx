@@ -4,7 +4,7 @@ import type { ModeConfig } from "@/lib/session/modes";
 import { ModelStatus } from "./model-status";
 import { Wordmark } from "./wordmark";
 
-/** Numa's header: wordmark, connection status, page actions. */
+/** The app header: title, connection status, page actions. */
 export function AppHeader({
   mode,
   connection,
@@ -19,7 +19,7 @@ export function AppHeader({
     <>
       <header className="flex items-center justify-between gap-4 px-6 pt-6 sm:px-10 sm:pt-8 lg:px-14">
         <h1>
-          <Wordmark className="text-[28px] sm:text-[32px]" />
+          <Wordmark className="text-[20px] sm:text-[24px]" />
           <span className="sr-only"> {mode.label}</span>
         </h1>
         <div className="flex items-center gap-5 sm:gap-7">

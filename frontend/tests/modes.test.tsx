@@ -16,7 +16,7 @@ async function startConversation(
 }
 
 describe("Conversation", () => {
-  it("keeps the studio and starts a session with the general Numa assistant", async () => {
+  it("keeps the studio and starts a session with the general assistant", async () => {
     const user = userEvent.setup();
     const voice = fakeVoice();
     render(
@@ -26,7 +26,7 @@ describe("Conversation", () => {
       />,
     );
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      "numa.",
+      "Local Speech-to-Speech",
     );
     expect(
       screen.getByRole("button", { name: "Transcript" }),
@@ -34,15 +34,15 @@ describe("Conversation", () => {
     await startConversation(user);
     expect(voice.last()?.config).toEqual({
       mode: "conversation",
-      persona: "numa-assistant",
-      hostName: "Numa",
+      persona: "assistant",
+      hostName: "Assistant",
     });
     expect(
       screen.getAllByLabelText("Local model: Connected").length,
     ).toBeGreaterThan(0);
   });
 
-  it("follows the engine: processing, Numa speaking, back to listening", async () => {
+  it("follows the engine: processing, assistant speaking, back to listening", async () => {
     const user = userEvent.setup();
     const voice = fakeVoice();
     render(
@@ -56,9 +56,9 @@ describe("Conversation", () => {
     act(() => callbacks?.onActivity("processing-started"));
     expect(screen.getByText("Processing")).toBeInTheDocument();
     act(() => callbacks?.onActivity("speech-started"));
-    expect(screen.getByText("Numa speaking")).toBeInTheDocument();
+    expect(screen.getByText("Assistant speaking")).toBeInTheDocument();
     expect(
-      screen.getByRole("img", { name: "Numa speech level" }),
+      screen.getByRole("img", { name: "Assistant speech level" }),
     ).toBeInTheDocument();
     act(() => callbacks?.onActivity("speech-ended"));
     expect(screen.getByText("Listening")).toBeInTheDocument();
@@ -91,7 +91,7 @@ describe("Conversation", () => {
           type: "entry.started",
           entryId: "host:r1",
           speaker: "host",
-          speakerName: "Numa",
+          speakerName: "Assistant",
           atMs: 1500,
         },
         {
@@ -111,7 +111,7 @@ describe("Conversation", () => {
     const items = within(screen.getByRole("list")).getAllByRole("listitem");
     expect(items.map((li) => li.textContent)).toEqual([
       expect.stringMatching(/^You.*What's new\?$/),
-      expect.stringMatching(/^Numa.*Quite a lot — \(interrupted\)$/),
+      expect.stringMatching(/^Assistant.*Quite a lot — \(interrupted\)$/),
     ]);
   });
 

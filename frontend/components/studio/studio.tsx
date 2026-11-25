@@ -37,9 +37,9 @@ const WAVEFORM_STATE: Record<ConversationStatus, WaveformState> = {
   ended: "idle",
 };
 
-/** `NEXT_PUBLIC_NUMA_VOICE=off` runs the studio without the voice engine: a microphone preview with simulation. */
+/** `NEXT_PUBLIC_VOICE_ENGINE=off` runs the studio without the voice engine: a microphone preview with simulation. */
 const DEFAULT_VOICE: VoiceFactory | null =
-  process.env.NEXT_PUBLIC_NUMA_VOICE === "off" ? null : browserVoice;
+  process.env.NEXT_PUBLIC_VOICE_ENGINE === "off" ? null : browserVoice;
 
 export interface StudioProps {
   mode?: ModeConfig;
@@ -101,7 +101,7 @@ export function Studio({
             aria-expanded={panel === "voice"}
             aria-controls="voice-studio"
             onClick={() => toggle("voice")}
-            className="flex items-center gap-2 rounded-full px-3 py-2 text-sm text-numa-slate transition-colors duration-200 hover:bg-white/[0.04] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="flex items-center gap-2 rounded-full px-3 py-2 text-sm text-app-slate transition-colors duration-200 hover:bg-white/[0.04] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <AudioLines aria-hidden="true" className="size-4" />
             Voice
@@ -112,7 +112,7 @@ export function Studio({
           aria-expanded={transcriptOpen}
           aria-controls="transcript"
           onClick={() => toggle("transcript")}
-          className="flex items-center gap-2 rounded-full px-3 py-2 text-sm text-numa-slate transition-colors duration-200 hover:bg-white/[0.04] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="flex items-center gap-2 rounded-full px-3 py-2 text-sm text-app-slate transition-colors duration-200 hover:bg-white/[0.04] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           {transcriptOpen ? (
             <PanelRightClose aria-hidden="true" className="size-4" />
@@ -127,7 +127,7 @@ export function Studio({
         <main className="flex flex-1 flex-col items-center justify-center gap-9 px-6 py-12 sm:gap-11 sm:px-10">
           <div className="flex flex-col items-center gap-3 text-center">
             <StateIndicator state={state} context={context} />
-            <p className="max-w-[46ch] text-sm leading-relaxed text-numa-slate/80">
+            <p className="max-w-[46ch] text-sm leading-relaxed text-app-slate/80">
               {copy.detail}
             </p>
           </div>
@@ -143,7 +143,7 @@ export function Studio({
               elapsedMs={elapsed}
               active={active && state.startedAt !== null}
             />
-            <p className="min-h-5 text-xs text-numa-slate/60">
+            <p className="min-h-5 text-xs text-app-slate/60">
               {conversation.deviceLabel ? conversation.deviceLabel : " "}
             </p>
           </div>
@@ -158,8 +158,8 @@ export function Studio({
           />
 
           {active && conversation.audioBlocked ? (
-            <output className="flex items-center gap-3 text-sm text-numa-slate">
-              <span>The browser paused Numa's audio.</span>
+            <output className="flex items-center gap-3 text-sm text-app-slate">
+              <span>The browser paused the assistant's audio.</span>
               <button
                 type="button"
                 onClick={conversation.resumeAudio}
@@ -173,18 +173,18 @@ export function Studio({
           {state.status === "error" && state.error ? (
             <div
               role="alert"
-              className="flex max-w-md items-start gap-3 rounded-xl border border-numa-coral/30 bg-numa-coral/[0.07] px-4 py-3 text-sm text-foreground"
+              className="flex max-w-md items-start gap-3 rounded-xl border border-app-coral/30 bg-app-coral/[0.07] px-4 py-3 text-sm text-foreground"
             >
               <TriangleAlert
                 aria-hidden="true"
-                className="mt-0.5 size-4 shrink-0 text-numa-coral"
+                className="mt-0.5 size-4 shrink-0 text-app-coral"
               />
               <span>{state.error.message}</span>
             </div>
           ) : (
-            <p className="max-w-[52ch] text-center text-xs leading-relaxed text-numa-slate/60">
+            <p className="max-w-[52ch] text-center text-xs leading-relaxed text-app-slate/60">
               {voice
-                ? "Microphone audio goes only to the Numa voice engine on this computer. Nothing is recorded or stored."
+                ? "Microphone audio goes only to the voice engine on this computer. Nothing is recorded or stored."
                 : "Local preview. Microphone audio is analysed in this browser only. It is never recorded, stored or sent, and no AI model is connected."}
             </p>
           )}

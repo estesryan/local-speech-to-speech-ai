@@ -6,24 +6,24 @@ import { engineRunning } from "./engine";
  * Voice Studio in Chrome against the real engine: upload an authorized reference, create the voice, make it the
  * Conversation default, then hold a spoken conversation in it. The reference is the generated question line (global-setup.ts).
  * The test removes its voice and restores the previous default afterwards. Because it writes to the running
- * engine's voice store, it runs only with NUMA_E2E_TEMP_VOICES=1, confirming that engine was started with a
- * temporary store (NUMA_VOICES_DIR); it never touches a normal store by accident.
+ * engine's voice store, it runs only with E2E_TEMP_VOICES=1, confirming that engine was started with a
+ * temporary store (VOICE_ENGINE_VOICES_DIR); it never touches a normal store by accident.
  */
 
 const REFERENCE = clipPath("question");
 const NAME = "E2E studio voice";
-const API = "http://127.0.0.1:8765/v1/numa/voices";
+const API = "http://127.0.0.1:8765/v1/voices";
 const ORIGIN = { origin: "http://localhost:3000" };
 
 test.use({ launchOptions: { args: fakeMicrophone(QUESTION_THEN_BARGE_WAV) } });
 test.beforeEach(async () => {
   test.skip(
-    process.env.NUMA_E2E_TEMP_VOICES !== "1",
-    "writes voices: start the engine with NUMA_VOICES_DIR=$(mktemp -d), then set NUMA_E2E_TEMP_VOICES=1",
+    process.env.E2E_TEMP_VOICES !== "1",
+    "writes voices: start the engine with VOICE_ENGINE_VOICES_DIR=$(mktemp -d), then set E2E_TEMP_VOICES=1",
   );
   test.skip(
     !(await engineRunning()),
-    "voice engine not running: start `uv run numa-voice serve`",
+    "voice engine not running: start `uv run voice-engine serve`",
   );
 });
 
@@ -55,8 +55,8 @@ test("create a voice, make it the default and converse in it", async ({
     created = (
       await (await request.get(API, { headers: ORIGIN })).json()
     ).voices.find((v: { name: string }) => v.name === NAME).id;
-    await item.getByRole("button", { name: "Set as Numa default" }).click();
-    await expect(item.getByText("Numa default")).toBeVisible();
+    await item.getByRole("button", { name: "Set as default voice" }).click();
+    await expect(item.getByText("Default voice")).toBeVisible();
     await item.getByRole("button", { name: `Preview ${NAME}` }).click();
     await expect(
       item.getByRole("button", { name: `Stop ${NAME}` }),
@@ -69,7 +69,7 @@ test("create a voice, make it the default and converse in it", async ({
     await expect(
       panel.getByText(`This conversation speaks as ${NAME}.`),
     ).toBeVisible();
-    await expect(page.getByText(/^Numa speaking$/)).toBeVisible({
+    await expect(page.getByText(/^Assistant speaking$/)).toBeVisible({
       timeout: 60_000,
     });
     await page.getByRole("button", { name: /end conversation/i }).click();

@@ -6,7 +6,7 @@ import { fakeMicrophone, QUESTION_THEN_BARGE_WAV } from "./audio";
  * Real browser, real voice engine: Chrome captures a scripted user from a fake microphone, the page streams it to
  * the engine, and the assistant's speech is played by Chrome (to its virtual output). This verifies the browser audio
  * path, transcripts and interruptions; it does not verify a physical microphone, speakers or echo cancellation.
- * Needs `uv run numa-voice serve` running in backend/voice-engine.
+ * Needs `uv run voice-engine serve` running in backend/voice-engine.
  */
 
 test.use({ launchOptions: { args: fakeMicrophone(QUESTION_THEN_BARGE_WAV) } });
@@ -21,7 +21,7 @@ test.beforeEach(async () => {
   });
   test.skip(
     !running,
-    "voice engine not running: start `uv run numa-voice serve` in backend/voice-engine",
+    "voice engine not running: start `uv run voice-engine serve` in backend/voice-engine",
   );
 });
 
@@ -63,12 +63,12 @@ async function converse(page: Page, startLabel: RegExp, host: string) {
   return entries.allTextContents();
 }
 
-test("Conversation: a spoken exchange with Numa, with an interruption", async ({
+test("Conversation: a spoken exchange with the assistant, with an interruption", async ({
   page,
 }) => {
   await page.goto("/");
-  const texts = await converse(page, /start conversation/i, "Numa");
-  expect(texts.some((t) => t.startsWith("Numa"))).toBe(true);
+  const texts = await converse(page, /start conversation/i, "Assistant");
+  expect(texts.some((t) => t.startsWith("Assistant"))).toBe(true);
   await page.getByRole("button", { name: /end conversation/i }).click();
   await expect(page.getByText("Session ended", { exact: true })).toBeVisible();
 });

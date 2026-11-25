@@ -10,7 +10,7 @@ import type { SessionConfig } from "@/lib/session/modes";
 import type { ServerEvent } from "./interruption";
 
 export const DEFAULT_VOICE_URL =
-  process.env.NEXT_PUBLIC_NUMA_VOICE_URL ?? "ws://127.0.0.1:8765/v1/realtime";
+  process.env.NEXT_PUBLIC_VOICE_ENGINE_URL ?? "ws://127.0.0.1:8765/v1/realtime";
 
 export type RealtimeErrorCode =
   | "backend-unavailable"
@@ -171,8 +171,8 @@ export function unreachableMessage(where: string): string {
   const page =
     typeof window === "undefined" ? "this page" : window.location.origin;
   return (
-    `Couldn't connect to the voice engine at ${where}. Start it with \`uv run numa-voice serve\` in ` +
-    `backend/voice-engine, or, if it is running, allow ${page} in NUMA_VOICE_ALLOWED_ORIGINS and restart it.`
+    `Couldn't connect to the voice engine at ${where}. Start it with \`uv run voice-engine serve\` in ` +
+    `backend/voice-engine, or, if it is running, allow ${page} in VOICE_ENGINE_ALLOWED_ORIGINS and restart it.`
   );
 }
 

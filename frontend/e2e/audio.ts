@@ -28,7 +28,7 @@ export async function generateClips(): Promise<void> {
     const deadline = Date.now() + 120_000;
     let response: Response;
     for (;;) {
-      response = await fetch(`${ENGINE}/v1/numa/voices/preview`, {
+      response = await fetch(`${ENGINE}/v1/voices/preview`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ voice_id: script.voice, text: line.text }),

@@ -6,9 +6,9 @@ from pathlib import Path
 
 import pytest
 
-from numa_voice.manifest import Model, hash_tree, load_manifest, verify
-from numa_voice.paths import PROJECT_ROOT, VOICE_ENGINE_DIR, models_root, runtime_env
-from numa_voice.profiles import (PLACEHOLDER, ProfileError, available_profiles, load_profile, required_models,
+from voice_engine.manifest import Model, hash_tree, load_manifest, verify
+from voice_engine.paths import PROJECT_ROOT, VOICE_ENGINE_DIR, models_root, runtime_env
+from voice_engine.profiles import (PLACEHOLDER, ProfileError, available_profiles, load_profile, required_models,
                                  resolve_profile)
 
 TRACKED = [*sorted((VOICE_ENGINE_DIR / "profiles").glob("*.yaml")), *sorted((VOICE_ENGINE_DIR / "personas").glob("*.yaml")),
@@ -43,13 +43,13 @@ def test_manifest_pins_every_model():
         assert not Path(m.path).is_absolute()
         if m.source["type"] in ("huggingface", "github-archive"):
             assert re.fullmatch(r"[0-9a-f]{40}", m.source["revision"]), f"{m.id} is not pinned to a commit"
-        assert m.files, f"{m.id}: run `numa-voice models lock`"
+        assert m.files, f"{m.id}: run `voice-engine models lock`"
 
 
 def test_models_root_defaults_to_project_and_can_be_overridden(monkeypatch, tmp_path):
-    monkeypatch.delenv("NUMA_MODELS_DIR", raising=False)
+    monkeypatch.delenv("VOICE_ENGINE_MODELS_DIR", raising=False)
     assert models_root() == PROJECT_ROOT / "models"
-    monkeypatch.setenv("NUMA_MODELS_DIR", str(tmp_path))
+    monkeypatch.setenv("VOICE_ENGINE_MODELS_DIR", str(tmp_path))
     assert models_root() == tmp_path.resolve()
 
 
@@ -104,8 +104,8 @@ def test_rendered_profiles_point_only_into_the_models_root():
 
 @pytest.mark.skipif(not models_present(), reason="fast-profile models are not installed under models/")
 def test_rendered_profile_passes_upstream_validation():
-    from numa_voice.paths import apply_runtime_env
-    from numa_voice.profiles import write_resolved
+    from voice_engine.paths import apply_runtime_env
+    from voice_engine.profiles import write_resolved
 
     apply_runtime_env()
     for speakers in (False, True):

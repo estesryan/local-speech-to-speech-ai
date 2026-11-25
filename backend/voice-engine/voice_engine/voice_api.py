@@ -1,13 +1,13 @@
 """Voice Studio HTTP API, served by the voice engine next to the Realtime WebSocket (patches/voice_studio.py).
 
-    GET    /v1/numa/voices                      voices, Conversation default, capabilities, whether a session is live
-    POST   /v1/numa/voices/preview              {voice_id | candidate, text} -> audio/wav (real synthesis)
-    POST   /v1/numa/voices?name=&method=&consent=true   body: WAV reference (recorded | uploaded)
-    POST   /v1/numa/voices/design/candidates    {description, count} -> candidate voices (base64 WAV)
-    POST   /v1/numa/voices/design               {token, index, name} -> saves a candidate
-    PATCH  /v1/numa/voices/{id}                 {name}
-    DELETE /v1/numa/voices/{id}
-    PUT    /v1/numa/voices/default              {voice_id}
+    GET    /v1/voices                      voices, Conversation default, capabilities, whether a session is live
+    POST   /v1/voices/preview              {voice_id | candidate, text} -> audio/wav (real synthesis)
+    POST   /v1/voices?name=&method=&consent=true   body: WAV reference (recorded | uploaded)
+    POST   /v1/voices/design/candidates    {description, count} -> candidate voices (base64 WAV)
+    POST   /v1/voices/design               {token, index, name} -> saves a candidate
+    PATCH  /v1/voices/{id}                 {name}
+    DELETE /v1/voices/{id}
+    PUT    /v1/voices/default              {voice_id}
 
 Generation (preview, transcription, design) is refused with 409 while a conversation is live, and a conversation
 is refused while generation runs (voice_models.generation): they would compete for the GPU. Only the browser origins
@@ -35,7 +35,7 @@ from . import voice_models
 from .voices import (CLONE_MODEL, DESIGN_MODEL, MAX_UPLOAD_BYTES, SAMPLE_RATE, Voice, VoiceError, VoiceNotFound,
                      VoiceStore, prepare_reference, valid_name, wav_bytes)
 
-logger = logging.getLogger("numa_voice.voice_api")
+logger = logging.getLogger("voice_engine.voice_api")
 TOO_LARGE = "The recording is larger than 15 MB. Use a shorter clip (up to 30 seconds)."
 DEFAULT_PREVIEW = "Hi, it's lovely to hear from you. Take your time; I'm happy to talk things through."
 CANDIDATE_TOKEN = re.compile(r"[0-9a-f]{16}")
@@ -70,7 +70,7 @@ class DefaultRequest(BaseModel):
 def router(busy: Callable[[], bool], store_factory: Callable[[], VoiceStore] = VoiceStore,
            models: Any = voice_models) -> APIRouter:
     """`busy` reports whether a conversation session is live; `models` is replaceable in tests."""
-    api = APIRouter(prefix="/v1/numa/voices")
+    api = APIRouter(prefix="/v1/voices")
 
     def store() -> VoiceStore:
         return store_factory()

@@ -1,16 +1,16 @@
 """Per-session personas for Realtime clients, with the prompt always composed on the server.
 
 A client chooses the persona by connecting to `/v1/realtime?persona=<id>`. This ASGI middleware composes that
-persona's prompt (`numa_voice.personas`: persona prompt plus engine instructions) and hands it to upstream as the
+persona's prompt (`voice_engine.personas`: persona prompt plus engine instructions) and hands it to upstream as the
 session's `instructions`, exactly as if the server had been launched with that persona. Without `persona` the
 session keeps the launch persona. An unknown persona is refused before upstream sees the connection, so no session
 slot is claimed.
 
-The persona also fixes the session's voice (`numa_voice.personas`): a built-in preset, or the Conversation default
+The persona also fixes the session's voice (`voice_engine.personas`): a built-in preset, or the Conversation default
 chosen in Voice Studio. A fixed voice is never replaced: if it cannot be used, the session is refused with an
 `error` event saying why, and no other voice is substituted. The server resolves and validates the voice, sets it
-as the session's `audio.output.voice` (`numa-voice:<id>` for a saved voice, patches/custom_voice.py), and right
-after `session.created` tells the client which voice is in use with a `numa.session` event, including why the
+as the session's `audio.output.voice` (`saved-voice:<id>` for a saved voice, patches/custom_voice.py), and right
+after `session.created` tells the client which voice is in use with a `voice_engine.session` event, including why the
 fallback voice is used if the chosen one cannot be.
 
 Every Realtime connection registers with voice_models.begin_session for its lifetime, so Voice Studio cannot
@@ -37,7 +37,7 @@ from ..personas import PersonaError, load_persona
 from ..voices import CONVERSATION_DEFAULT, FALLBACK_VOICE, Voice, VoiceNotFound, VoiceStore
 from . import require
 
-logger = logging.getLogger("numa_voice.session_persona")
+logger = logging.getLogger("voice_engine.session_persona")
 REALTIME_PATH = "/v1/realtime"
 
 
@@ -69,7 +69,7 @@ def resolve_voice(persona_voice: str, store: VoiceStore | None = None) -> tuple[
         clone = voice_models.capabilities()["clone"]
         if not voice.builtin and not clone["available"]:
             raise HostVoiceUnavailable(f"{persona_voice} needs the Qwen3-TTS Base model ({clone['reason']})")
-    token = voice.profile["speaker"] if voice.builtin else f"numa-voice:{voice.id}"
+    token = voice.profile["speaker"] if voice.builtin else f"saved-voice:{voice.id}"
     return voice, token, reason
 
 
@@ -131,7 +131,7 @@ class SessionPersona:
                         f" (fallback: {fallback})" if fallback else "")
             session = {"type": "realtime", "instructions": instructions, "audio": {"output": {"voice": token}}}
             update = {"type": "websocket.receive", "text": json.dumps({"type": "session.update", "session": session})}
-            notice = {"type": "numa.session", "persona": persona_id,
+            notice = {"type": "voice_engine.session", "persona": persona_id,
                       "voice": {"id": voice.id, "name": voice.name, "method": voice.method}, "voice_fallback": fallback}
 
         async def send_with_notice(message: dict) -> None:

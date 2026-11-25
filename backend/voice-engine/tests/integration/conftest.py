@@ -1,7 +1,7 @@
-"""A real voice engine for integration tests: `numa-voice serve --profile fast --persona ren-test`, offline.
+"""A real voice engine for integration tests: `voice-engine serve --profile fast --persona ren-test`, offline.
 
 Its saved voices are a temporary directory, never the user's data/voices.
-Set NUMA_VOICE_TEST_URL to use an already running server instead (log-based assertions are then skipped).
+Set VOICE_ENGINE_TEST_URL to use an already running server instead (log-based assertions are then skipped).
 
 Test speech is generated for each run (`speech_clips`): no recordings are committed.
 """
@@ -39,18 +39,18 @@ class Engine:
 
 @pytest.fixture(scope="session")
 def engine(tmp_path_factory):
-    if os.environ.get("NUMA_VOICE_TEST_URL"):
-        yield Engine(os.environ["NUMA_VOICE_TEST_URL"], None)
+    if os.environ.get("VOICE_ENGINE_TEST_URL"):
+        yield Engine(os.environ["VOICE_ENGINE_TEST_URL"], None)
         return
     with socket.socket() as s:
         if s.connect_ex(("127.0.0.1", 8765)) == 0:
-            pytest.fail("port 8765 is busy: stop the running voice engine or set NUMA_VOICE_TEST_URL")
+            pytest.fail("port 8765 is busy: stop the running voice engine or set VOICE_ENGINE_TEST_URL")
     log = tmp_path_factory.mktemp("engine") / "serve.log"
     # ren-test: the fixtures address the assistant as "Ren", and its prompt stays fixed between runs
     voices = tmp_path_factory.mktemp("voices")  # never the user's data/voices
-    proc = subprocess.Popen([str(ENGINE_DIR / ".venv/bin/numa-voice"), "serve", "--profile", "fast", "--persona", "ren-test"],
+    proc = subprocess.Popen([str(ENGINE_DIR / ".venv/bin/voice-engine"), "serve", "--profile", "fast", "--persona", "ren-test"],
                             cwd=ENGINE_DIR, stdout=open(log, "w"), stderr=subprocess.STDOUT,
-                            env={**os.environ, "NUMA_VOICES_DIR": str(voices)})
+                            env={**os.environ, "VOICE_ENGINE_VOICES_DIR": str(voices)})
     deadline = time.time() + 180
     while "Uvicorn running" not in log.read_text(errors="replace"):
         if proc.poll() is not None or time.time() > deadline:
@@ -69,7 +69,7 @@ def _preview(base: str, voice: str, text: str, timeout_s: float = 120.0) -> byte
     """Speech from the engine's Voice Studio preview; waits while an earlier session is still being released."""
     deadline = time.monotonic() + timeout_s
     while True:
-        request = Request(f"{base}/v1/numa/voices/preview", data=json.dumps({"voice_id": voice, "text": text}).encode(),
+        request = Request(f"{base}/v1/voices/preview", data=json.dumps({"voice_id": voice, "text": text}).encode(),
                           method="POST", headers={"content-type": "application/json"})
         try:
             with urlopen(request, timeout=300) as response:

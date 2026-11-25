@@ -1,6 +1,6 @@
-# Numa voice-engine model manifest: every model, its pinned source, license and project-local path.
-# Paths are relative to the models root: <project>/models by default, or $NUMA_MODELS_DIR.
-# `files` (size + SHA-256) is written by `numa-voice models lock` and checked by `numa-voice models verify`.
+# Voice-engine model manifest: every model, its pinned source, license and project-local path.
+# Paths are relative to the models root: <project>/models by default, or $VOICE_ENGINE_MODELS_DIR.
+# `files` (size + SHA-256) is written by `voice-engine models lock` and checked by `voice-engine models verify`.
 schema: 1
 models:
   vad/silero-vad:

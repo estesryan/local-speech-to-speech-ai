@@ -1,15 +1,19 @@
-# Numa — Local Speech-to-Speech AI
+# Local Speech-to-Speech AI
 
-Numa is a local-first AI voice assistant. You talk to it out loud in your browser and it answers out loud, in real
-time, with every model running on your own Mac: speech recognition, the language model and speech synthesis.
-Nothing is sent to a cloud service, and your microphone audio is not recorded or stored.
+A real-time conversational AI system with fully local inference. You talk out loud in your browser and an assistant
+answers out loud, in real time, with every model running on your own Mac: speech recognition, the language model
+and speech synthesis. No cloud inference API is used, and after the initial model download it works offline. Your
+microphone audio is not recorded or stored.
+
+It is a cascaded pipeline (turn detection, speech recognition, language model, speech synthesis) built on Hugging
+Face speech-to-speech and MLX, not a single end-to-end speech model. It runs on Apple Silicon Macs only.
 
 ## Features
 
-- **Spoken conversation:** open-ended, low-latency voice chat with Numa, a general-purpose assistant.
+- **Spoken conversation:** open-ended, low-latency voice chat with a general-purpose assistant.
 - **Turn-taking:** voice activity detection (Silero VAD) and end-of-turn detection (Smart Turn) decide when you
   have finished speaking.
-- **Interruptions:** start talking while Numa speaks and it stops at once. Its memory of the conversation then keeps
+- **Interruptions:** start talking while the assistant speaks and it stops at once. Its memory of the conversation then keeps
   only the words you actually heard, so it follows you instead of repeating itself.
 - **Live transcript** of both speakers, with partial text while you speak.
 - **Voice Studio:** choose one of six built-in voices, or create your own by recording or uploading a short
@@ -46,7 +50,7 @@ Headphones are recommended (see [Known limitations](#known-limitations)).
 ## Project structure
 
 ```
-backend/voice-engine/    local voice engine (Python, uv): speech-to-speech plus Numa's profiles, personas and fixes
+backend/voice-engine/    local voice engine (Python, uv): speech-to-speech plus profiles, personas and fixes
 frontend/                browser app (Next.js, npm)
 docs/                    architecture
 models/                  model weights (created by setup; not versioned)
@@ -56,6 +60,9 @@ data/voices/             your Voice Studio voices (created on first use; private
 ## Install
 
 ```bash
+git clone https://github.com/estesryan/local-speech-to-speech-ai.git
+cd local-speech-to-speech-ai
+
 curl -LsSf https://astral.sh/uv/install.sh | sh     # once, if uv is missing
 
 # Voice engine: Python environment, default models (downloaded and verified), unit tests
@@ -75,23 +82,23 @@ SHA-256 against `backend/voice-engine/model-manifest.yaml`. To do it by hand:
 
 ```bash
 cd backend/voice-engine
-uv run numa-voice models download --profile fast     # about 9 GB
-uv run numa-voice models verify --profile fast
-uv run numa-voice models list                        # status, size and license of every model
+uv run voice-engine models download --profile fast     # about 9 GB
+uv run voice-engine models verify --profile fast
+uv run voice-engine models list                        # status, size and license of every model
 ```
 
 Optional models:
 
 ```bash
 # Voice Studio's Record, Upload and Describe (2.7 GB each)
-uv run numa-voice models download --ids tts/qwen3-tts-1.7b-base-6bit tts/qwen3-tts-1.7b-voicedesign-6bit
+uv run voice-engine models download --ids tts/qwen3-tts-1.7b-base-6bit tts/qwen3-tts-1.7b-voicedesign-6bit
 
 # The larger language model for the `quality` profile (6 GB)
-uv run numa-voice models download --profile quality
+uv run voice-engine models download --profile quality
 ```
 
-Set `NUMA_MODELS_DIR` to keep models elsewhere. At run time the engine works offline and loads models only from
-that folder. Each model has its own license (listed by `models list` and in the manifest); for example, Parakeet is
+Set `VOICE_ENGINE_MODELS_DIR` to keep models elsewhere. At run time the engine works offline and loads models only
+from that folder. Each model has its own license (listed by `models list` and in the manifest); for example, Parakeet is
 CC BY 4.0 and Qwen3.5 / Qwen3-TTS are Apache 2.0.
 
 ## Run
@@ -101,7 +108,7 @@ Two terminals, from the project root:
 ```bash
 # 1. The voice engine (keep it running; ready when it logs "Uvicorn running")
 cd backend/voice-engine
-uv run numa-voice serve
+uv run voice-engine serve
 
 # 2. The browser app
 cd frontend
@@ -109,31 +116,31 @@ npm run dev
 ```
 
 Open <http://localhost:3000> and allow microphone access. Use `localhost` or `127.0.0.1`: the engine accepts only
-those browser origins by default (`NUMA_VOICE_ALLOWED_ORIGINS` changes that).
+those browser origins by default (`VOICE_ENGINE_ALLOWED_ORIGINS` changes that).
 
-For a production build, use `npm run build && npm run start` instead of `npm run dev`. `uv run numa-voice serve
---profile quality` uses the 9B model. Without the browser, `uv run numa-voice run` holds the same conversation in
+For a production build, use `npm run build && npm run start` instead of `npm run dev`. `uv run voice-engine serve
+--profile quality` uses the 9B model. Without the browser, `uv run voice-engine run` holds the same conversation in
 the terminal.
 
 Optional settings are listed in `frontend/.env.example` and `backend/voice-engine/.env.example`.
 
 ## Use
 
-**Conversation.** Press *Start conversation* and talk. Numa listens, thinks and answers; the waveform shows who is
+**Conversation.** Press *Start conversation* and talk. The assistant listens, thinks and answers; the waveform shows who is
 speaking. Interrupt it at any time. The microphone button mutes you; *End conversation* stops everything.
 *Transcript* in the header opens the transcript; *Clear* empties the displayed transcript only.
 
 **Voice Studio.** *Voice* in the header opens the panel:
 
-- **Choose:** preview any voice with your own text, then *Set as Numa default*. It applies from the next
+- **Choose:** preview any voice with your own text, then *Set as default voice*. It applies from the next
   conversation (Serena until you choose).
 - **Create:** *Record* (read the passage shown, 3–30 s), *Upload* an audio file, or *Describe* a voice and pick one
   of three generated candidates. Record and Upload require confirming that it is your own voice or that its owner
   has given permission. These need the optional models above; without them the panel says so.
 - **Manage:** rename or delete your voices.
 
-Saved voices are kept on your Mac in `data/voices/` (or `NUMA_VOICES_DIR`). The folder is created on first use, is
-git-ignored, and holds reference recordings: keep it private. A fresh install starts with no saved voices.
+Saved voices are kept on your Mac in `data/voices/` (or `VOICE_ENGINE_VOICES_DIR`). The folder is created on first
+use, is git-ignored, and holds reference recordings: keep it private. A fresh install starts with no saved voices.
 
 ## Known limitations
 
@@ -143,8 +150,8 @@ git-ignored, and holds reference recordings: keep it private. A fresh install st
   Other hardware backends may be feasible in future, but none has been integrated or validated.
 - **One conversation at a time:** a second browser tab is refused while a conversation runs.
 - **Speakers and echo:** echo cancellation with laptop speakers has not been validated on real hardware. With
-  speakers, Numa may hear itself and interrupt its own replies. Use headphones, or add `?halfDuplex` to the page URL
-  (your microphone is ignored while Numa speaks, so you cannot interrupt it).
+  speakers, the assistant may hear itself and interrupt its own replies. Use headphones, or add `?halfDuplex` to the page URL
+  (your microphone is ignored while the assistant speaks, so you cannot interrupt it).
 - **English:** the prompts and test material are English; other languages are untested.
 - **Local network only:** the engine has an origin check but no authentication. Do not expose port 8765 to a
   network.

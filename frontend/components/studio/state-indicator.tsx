@@ -60,7 +60,7 @@ export function describeState(
         label: `Processing${simulated}`,
         detail: host
           ? `Waiting for ${host} to respond.`
-          : "Waiting for Numa to respond.",
+          : "Waiting for the assistant to respond.",
       };
     case "speaking":
       return host
@@ -69,11 +69,11 @@ export function describeState(
             detail: "Just start talking to interrupt.",
           }
         : {
-            label: `Numa speaking${simulated}`,
+            label: `Assistant speaking${simulated}`,
             detail:
               state.source === "simulation"
                 ? "No speech audio exists yet."
-                : "Numa's audio is playing.",
+                : "The assistant's audio is playing.",
           };
     case "muted":
       return {
@@ -97,14 +97,14 @@ export function describeState(
 }
 
 const DOT: Record<ConversationState["status"], string> = {
-  idle: "bg-numa-slate/50",
-  connecting: "bg-numa-slate motion-safe:animate-pulse",
-  listening: "bg-numa-mint",
-  processing: "bg-numa-slate motion-safe:animate-pulse",
+  idle: "bg-app-slate/50",
+  connecting: "bg-app-slate motion-safe:animate-pulse",
+  listening: "bg-app-mint",
+  processing: "bg-app-slate motion-safe:animate-pulse",
   speaking: "bg-[#ecf1f5]",
-  muted: "border border-numa-slate/70",
-  error: "bg-numa-coral",
-  ended: "bg-numa-slate/50",
+  muted: "border border-app-slate/70",
+  error: "bg-app-coral",
+  ended: "bg-app-slate/50",
 };
 
 export function StateIndicator({
@@ -124,7 +124,7 @@ export function StateIndicator({
           DOT[state.status],
         )}
       />
-      <span className="text-[13px] font-medium tracking-[0.08em] text-numa-slate uppercase">
+      <span className="text-[13px] font-medium tracking-[0.08em] text-app-slate uppercase">
         {label}
       </span>
     </div>
