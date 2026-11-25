@@ -12,7 +12,7 @@ describe("Waveform", () => {
     ["idle", "Waveform at rest"],
     ["listening", "Live microphone level"],
     ["processing", "Processing indicator (not audio)"],
-    ["speaking", "Numa speech level"],
+    ["speaking", "Assistant speech level"],
     ["muted", "Microphone muted"],
     ["error", "Waveform unavailable"],
   ])("describes the %s state accessibly", (state, label) => {
@@ -43,7 +43,7 @@ describe("Waveform", () => {
     window.matchMedia = original;
   });
 
-  it("uses the 52-bar signature from the Numa panel asset", () => {
+  it("uses the 52-bar signature from the panel asset", () => {
     expect(SIGNATURE).toHaveLength(52);
     expect(Math.max(...SIGNATURE)).toBe(1);
     expect(SIGNATURE[0]).toBeCloseTo(29 / 200);

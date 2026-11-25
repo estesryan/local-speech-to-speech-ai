@@ -7,7 +7,7 @@ from fastapi import FastAPI, WebSocket
 from fastapi.testclient import TestClient
 from starlette.websockets import WebSocketDisconnect
 
-from numa_voice.patches import origin
+from voice_engine.patches import origin
 
 LOCAL = "http://localhost:3000"
 

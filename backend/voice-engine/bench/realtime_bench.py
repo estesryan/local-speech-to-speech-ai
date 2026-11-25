@@ -34,7 +34,7 @@ import numpy as np
 import soundfile as sf
 import websockets
 
-from numa_voice.interruption import NOTE_PREFIX, InterruptionHistory
+from voice_engine.interruption import NOTE_PREFIX, InterruptionHistory
 
 HERE = Path(__file__).resolve().parent
 DATA = HERE.parent / "bench-data"
@@ -153,7 +153,7 @@ class Events:
         self.sent: list[tuple[float, dict]] = []  # events written back by the interruption fix
         self.changed = asyncio.Event()
         self.ws = ws
-        # Numa's interruption fix (numa_voice.interruption), with playback emulated in real time
+        # the engine's interruption fix (voice_engine.interruption), with playback emulated in real time
         self.history = InterruptionHistory(RATE) if history_fix else None
 
     def after(self, t: float) -> list[Response]:
@@ -475,7 +475,7 @@ def main() -> None:
     manifest = json.loads((DATA / "manifest.json").read_text())
     out = RESULTS / args.run
     (out / "audio").mkdir(parents=True, exist_ok=True)
-    pid = args.server_pid or int(subprocess.run(["pgrep", "-f", "(numa-voice|speech-to-speech) serve"], capture_output=True,
+    pid = args.server_pid or int(subprocess.run(["pgrep", "-f", "(voice-engine|speech-to-speech) serve"], capture_output=True,
                                                  text=True).stdout.split()[0])
     sampler = Sampler(pid)
     sampler.start()

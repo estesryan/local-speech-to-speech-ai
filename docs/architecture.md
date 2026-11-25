@@ -1,6 +1,6 @@
 # Architecture
 
-Numa has two processes on one Mac: a **browser app** (`frontend/`, Next.js) and a **voice engine**
+The project has two processes on one Mac: a **browser app** (`frontend/`, Next.js) and a **voice engine**
 (`backend/voice-engine/`, Python). The engine wraps Hugging Face
 [speech-to-speech](https://github.com/huggingface/speech-to-speech) 1.1.0 ("upstream") and runs every model locally
 on MLX. Nothing leaves the machine.
@@ -13,7 +13,7 @@ Browser (localhost:3000)                          Voice engine (127.0.0.1:8765)
 │                              │  Realtime events │   → Qwen3.5 via mlx-lm    (reply text)        │
 │ playback ◄── audio deltas ◄──┼◄─────────────────┤   → Qwen3-TTS             (text → speech)     │
 │ transcript, state machine    │                  │                                               │
-│ Voice panel ── HTTP ─────────┼─────────────────►│ Voice Studio API (/v1/numa/voices)            │
+│ Voice panel ── HTTP ─────────┼─────────────────►│ Voice Studio API (/v1/voices)            │
 └──────────────────────────────┘                  └───────────────────────────────────────────────┘
 ```
 
@@ -24,13 +24,13 @@ the conversation state machine (`lib/state/conversation-machine.ts`: `idle → c
 plus `processing`, `speaking`, `error` and `ended`), the client half of interruption handling,
 and the Voice panel UI. It never sends prompt text and never chooses the voice.
 
-**Voice engine** (`numa_voice`, launched by the `numa-voice` CLI):
+**Voice engine** (`voice_engine`, launched by the `voice-engine` CLI):
 
 - **Profiles** (`profiles/`) pick the models; **personas** (`personas/`) define the assistant's prompt and voice.
 - **Model loading:** weights live under `models/`, pinned and hashed in `model-manifest.yaml`, and are loaded by
   path with Hugging Face offline mode on. A missing model fails at startup rather than being downloaded.
 - **Pipeline:** upstream runs the speech pipeline and the Realtime server.
-- **Fixes:** Numa's changes to upstream behaviour are applied at launch (see
+- **Fixes:** the project's changes to upstream behaviour are applied at launch (see
   [Upstream boundary](#upstream-boundary)).
 
 ## Speech pipeline
@@ -50,19 +50,19 @@ After `chat_size` (30) user turns, upstream summarizes older history with the LL
 
 ## WebSocket session
 
-The browser connects to `ws://127.0.0.1:8765/v1/realtime?persona=numa-assistant` with the `realtime` subprotocol,
+The browser connects to `ws://127.0.0.1:8765/v1/realtime?persona=assistant` with the `realtime` subprotocol,
 using an OpenAI Realtime-style protocol:
 
 1. **Origin and Host check:** an Origin outside the allowlist (`profiles/base.yaml`, or
-   `NUMA_VOICE_ALLOWED_ORIGINS`) is rejected with 403 before a session slot is claimed. Requests without an Origin
+   `VOICE_ENGINE_ALLOWED_ORIGINS`) is rejected with 403 before a session slot is claimed. Requests without an Origin
    (CLI clients, tests) are allowed, but every request must name a loopback Host (`localhost`, `127.0.0.1`,
    `[::1]`), which stops DNS-rebinding pages. This protects a local machine from other web pages; it is not
    authentication.
 2. **Persona:** the engine loads the persona, composes its prompt and resolves its voice. An unknown persona is
    refused. If the persona's voice is unavailable, the engine reports an `error` event and closes; it never
    substitutes a different voice.
-3. **Session setup:** after `session.created`, the engine sends a Numa event, `numa.session`, naming the voice in
-   use and, if the user's chosen default could not be used, why Serena was used instead. The client then sends
+3. **Session setup:** after `session.created`, the engine sends its own event, `voice_engine.session`, naming the voice
+   in use and, if the user's chosen default could not be used, why Serena was used instead. The client then sends
    its `session.update`.
 4. **Client restrictions:** `instructions` and `audio.output.voice` are stripped from client events, and
    `system`/`developer` messages are dropped. Only the server sets the prompt and voice.
@@ -78,8 +78,8 @@ appears.
 
 ## Turn-taking and interruptions
 
-Silero VAD and Smart Turn decide when the user has finished speaking. When the user starts talking while Numa
-speaks (`input_audio_buffer.speech_started`), the page clears its playback at once and upstream cancels the reply
+Silero VAD and Smart Turn decide when the user has finished speaking. When the user starts talking while the
+assistant speaks (`input_audio_buffer.speech_started`), the page clears its playback at once and upstream cancels the reply
 if it is still being generated.
 
 Upstream then drops the interrupted reply from its history, so the model would not know it was interrupted and
@@ -98,26 +98,26 @@ quoted half-sentences made later replies come out truncated, read the marker alo
 sentence. The prompts call the user "the guest"; that wording is part of the tested prompt.
 
 There are two implementations: `frontend/lib/realtime/interruption.ts` (browser) and
-`numa_voice/interruption.py` (the terminal client, `numa-voice run` / `talk`). Both replay the same event traces in
+`voice_engine/interruption.py` (the terminal client, `voice-engine run` / `talk`). Both replay the same event traces in
 tests, so they must change together.
 
-**Speakers:** the browser's echo cancellation is on, but whether it suppresses Numa's own voice from laptop speakers
-has not been verified. `?halfDuplex` in the page URL sends silence while Numa speaks, which disables interruptions.
+**Speakers:** the browser's echo cancellation is on, but whether it suppresses the assistant's own voice from laptop
+speakers has not been verified. `?halfDuplex` in the page URL sends silence while the assistant speaks, which disables interruptions.
 
 ## Voice Studio
 
-Voice Studio is served by the same engine process: an HTTP API under `/v1/numa/voices` (`numa_voice/voice_api.py`)
+Voice Studio is served by the same engine process: an HTTP API under `/v1/voices` (`voice_engine/voice_api.py`)
 with CORS for the same allowed origins.
 
 - **Built-in voices:** six Qwen3-TTS CustomVoice presets. Serena is the default until the user chooses another.
 - **Saved voices:** recorded, uploaded or designed. Each is a reference clip plus its transcript in
-  `data/voices/<id>/` (or `NUMA_VOICES_DIR`). Record and Upload require the owner's consent; the transcript comes
+  `data/voices/<id>/` (or `VOICE_ENGINE_VOICES_DIR`). Record and Upload require the owner's consent; the transcript comes
   from Parakeet. Describe uses the VoiceDesign model to generate three candidates; the chosen one becomes the
   reference.
 - **Live use:** a saved voice is cloned by the Qwen3-TTS **Base** model on every reply, through upstream's own
   streaming path, so cancellation and the MLX lock behave as they do for presets.
 - **Fixed per session:** the voice is chosen when a session starts; a new default applies from the next one.
-- **Personas:** `numa-assistant` speaks in the user's chosen default. Other personas use a fixed preset and can
+- **Personas:** `assistant` speaks in the user's chosen default. Other personas use a fixed preset and can
   never use a saved voice.
 - **No conflict with live speech:** conversations and generation (previews, transcription, design) exclude each
   other. Generation is refused with 409 while a conversation is connected, and a conversation is refused with an
@@ -130,9 +130,9 @@ with CORS for the same allowed origins.
 
 ## Upstream boundary
 
-Nothing inside `.venv` is edited. `numa-voice` replaces specific upstream functions in memory at launch
-(`numa_voice/patches/`). Each patch first checks the upstream version (1.1.0) and the exact source it depends on,
-and stops with `UpstreamIncompatible` if either changed. `NUMA_VOICE_ALLOW_UNTESTED_UPSTREAM=1` skips only the
+Nothing inside `.venv` is edited. `voice-engine` replaces specific upstream functions in memory at launch
+(`voice_engine/patches/`). Each patch first checks the upstream version (1.1.0) and the exact source it depends on,
+and stops with `UpstreamIncompatible` if either changed. `VOICE_ENGINE_ALLOW_UNTESTED_UPSTREAM=1` skips only the
 version check.
 
 | Patch | Purpose |

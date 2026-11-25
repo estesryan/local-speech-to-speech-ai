@@ -80,7 +80,7 @@ def verify(model: Model, root: Path, deep: bool = True) -> list[str]:
     if not d.is_dir():
         return [f"missing directory {d}"]
     if not model.files:
-        return [f"{model.id}: manifest has no file list; run `numa-voice models lock`"]
+        return [f"{model.id}: manifest has no file list; run `voice-engine models lock`"]
     problems = []
     for rel, meta in model.files.items():
         p = d / rel

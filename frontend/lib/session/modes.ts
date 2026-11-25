@@ -14,7 +14,7 @@ export interface ModeConfig {
   persona: string;
   /** Speaker name in the transcript. */
   hostName: string;
-  /** Short name in status labels ("Numa speaking"). */
+  /** Short name in status labels ("Assistant speaking"). */
   speakerLabel: string;
   idleDetail: string;
   startLabel: string;

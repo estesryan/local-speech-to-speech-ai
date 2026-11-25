@@ -7,7 +7,7 @@ import { microphoneError } from "@/lib/audio/microphone";
 import { deferred, fakeSession } from "./helpers/fake-media";
 
 describe("Studio", () => {
-  it("renders the Numa brand, an honest model status and the start control", () => {
+  it("renders the app title, an honest model status and the start control", () => {
     render(
       <Studio
         voice={null}
@@ -16,7 +16,7 @@ describe("Studio", () => {
       />,
     );
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      "numa.",
+      "Local Speech-to-Speech",
     );
     expect(
       screen.getAllByLabelText("Local model: Not connected").length,

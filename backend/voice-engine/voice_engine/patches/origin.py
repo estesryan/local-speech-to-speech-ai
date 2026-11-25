@@ -7,7 +7,7 @@ WebSocket handshakes and cross-origin requests, and pages cannot forge it, so:
 - Origin in the allowlist: allowed.
 - Any other Origin (including "null"): rejected before the request reaches upstream, so no session slot is claimed
   (WebSocket: HTTP 403 handshake rejection; HTTP: 403).
-- No Origin header: a non-browser local client (`numa-voice talk`, benchmarks, tests); allowed when
+- No Origin header: a non-browser local client (`voice-engine talk`, benchmarks, tests); allowed when
   `allow_missing_origin` is true (the default). The server only listens on 127.0.0.1.
 
 Browsers omit Origin on same-origin GET requests, so a DNS-rebinding page (attacker.example resolved to
@@ -28,10 +28,10 @@ from speech_to_speech.api.openai_realtime import server
 
 from . import require, require_source
 
-logger = logging.getLogger("numa_voice.origin")
+logger = logging.getLogger("voice_engine.origin")
 DEFAULT_ALLOWED_ORIGINS = ("http://localhost:3000", "http://127.0.0.1:3000")
 LOOPBACK_HOSTS = {"localhost", "127.0.0.1", "::1"}
-ENV_ALLOWED_ORIGINS = "NUMA_VOICE_ALLOWED_ORIGINS"
+ENV_ALLOWED_ORIGINS = "VOICE_ENGINE_ALLOWED_ORIGINS"
 
 require(server, "create_app", "RealtimeServer")
 require_source(server.RealtimeServer.run, "create_app(")  # run() looks create_app up in the module: patchable

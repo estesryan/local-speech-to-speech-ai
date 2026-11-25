@@ -245,7 +245,7 @@ export function VoiceCreate({
     !blocked;
   const nameField = (
     <label className="flex flex-col gap-1.5">
-      <span className="text-xs text-numa-slate/80">Name</span>
+      <span className="text-xs text-app-slate/80">Name</span>
       <input
         value={name}
         onChange={(e) => setName(e.target.value)}
@@ -255,7 +255,7 @@ export function VoiceCreate({
     </label>
   );
   const consentField = (
-    <label className="flex items-start gap-2 text-xs leading-relaxed text-numa-slate/85">
+    <label className="flex items-start gap-2 text-xs leading-relaxed text-app-slate/85">
       <input
         type="checkbox"
         checked={consent}
@@ -277,7 +277,7 @@ export function VoiceCreate({
       <p
         className={cn(
           "text-xs",
-          reference.check.problem ? "text-numa-coral" : "text-numa-slate/70",
+          reference.check.problem ? "text-app-coral" : "text-app-slate/70",
         )}
       >
         {reference.check.problem ??
@@ -306,7 +306,7 @@ export function VoiceCreate({
 
   return (
     <div className="flex flex-col gap-4">
-      <h3 className="text-xs font-medium tracking-[0.08em] text-numa-slate uppercase">
+      <h3 className="text-xs font-medium tracking-[0.08em] text-app-slate uppercase">
         Create a voice
       </h3>
       <div
@@ -336,7 +336,7 @@ export function VoiceCreate({
             }}
             className={cn(
               chip,
-              tab === id && "border-numa-slate/40 text-foreground",
+              tab === id && "border-app-slate/40 text-foreground",
             )}
           >
             <Icon aria-hidden="true" className="size-3.5" />
@@ -352,24 +352,24 @@ export function VoiceCreate({
         className="flex flex-col gap-4"
       >
         {(tab === "record" || tab === "upload") && cloneReason && (
-          <p className="text-xs leading-relaxed text-numa-slate/75">
+          <p className="text-xs leading-relaxed text-app-slate/75">
             Unavailable: {cloneReason}
           </p>
         )}
         {tab === "describe" && designReason && (
-          <p className="text-xs leading-relaxed text-numa-slate/75">
+          <p className="text-xs leading-relaxed text-app-slate/75">
             Unavailable: {designReason}
           </p>
         )}
 
         {tab === "record" && !cloneReason && (
           <>
-            <p className="text-xs leading-relaxed text-numa-slate/80">
+            <p className="text-xs leading-relaxed text-app-slate/80">
               Read this aloud in a quiet room, 20–30 cm from the microphone, in
               your normal speaking voice. 10–20 seconds works best (up to{" "}
               {MAX_SECONDS}).
             </p>
-            <blockquote className="border-l-2 border-numa-mint/50 pl-3 text-sm leading-relaxed text-foreground/90">
+            <blockquote className="border-l-2 border-app-mint/50 pl-3 text-sm leading-relaxed text-foreground/90">
               {READING_PASSAGE}
             </blockquote>
             {recorder ? (
@@ -387,7 +387,7 @@ export function VoiceCreate({
                   Cancel
                 </button>
                 <span
-                  className="text-xs tabular-nums text-numa-slate"
+                  className="text-xs tabular-nums text-app-slate"
                   aria-live="off"
                 >
                   {formatDuration(elapsed * 1000)} /{" "}
@@ -398,7 +398,7 @@ export function VoiceCreate({
                   className="h-1 flex-1 overflow-hidden rounded-full bg-white/[0.06]"
                 >
                   <span
-                    className="block h-full bg-numa-mint"
+                    className="block h-full bg-app-mint"
                     style={{ width: `${Math.round(level * 100)}%` }}
                   />
                 </span>
@@ -444,7 +444,7 @@ export function VoiceCreate({
 
         {tab === "upload" && !cloneReason && (
           <>
-            <p className="text-xs leading-relaxed text-numa-slate/80">
+            <p className="text-xs leading-relaxed text-app-slate/80">
               A clear recording of one speaker, 3–{MAX_SECONDS} s, without music
               (WAV, MP3, M4A, OGG or WebM; up to 15 MB). Only use a voice you
               own or have permission to use.
@@ -455,7 +455,7 @@ export function VoiceCreate({
               aria-label="Voice recording file"
               disabled={blocked || busy}
               onChange={(e) => void onFile(e)}
-              className="text-xs text-numa-slate file:mr-3 file:rounded-full file:border file:border-border file:bg-transparent file:px-3 file:py-1.5 file:text-xs file:text-numa-slate"
+              className="text-xs text-app-slate file:mr-3 file:rounded-full file:border file:border-border file:bg-transparent file:px-3 file:py-1.5 file:text-xs file:text-app-slate"
             />
             {referenceSummary}
             {reference && (
@@ -471,7 +471,7 @@ export function VoiceCreate({
         {tab === "describe" && !designReason && (
           <>
             <label className="flex flex-col gap-1.5">
-              <span className="text-xs text-numa-slate/80">
+              <span className="text-xs text-app-slate/80">
                 Describe the voice
               </span>
               <textarea
@@ -503,7 +503,7 @@ export function VoiceCreate({
             </button>
             {candidates && (
               <fieldset className="flex flex-col gap-2">
-                <legend className="mb-1 text-xs text-numa-slate/80">
+                <legend className="mb-1 text-xs text-app-slate/80">
                   Choose one
                 </legend>
                 {candidates.candidates.map((c) => {
@@ -590,7 +590,7 @@ export function VoiceCreate({
         )}
 
         {recordError && (
-          <p role="alert" className="text-xs text-numa-coral">
+          <p role="alert" className="text-xs text-app-coral">
             {recordError}
           </p>
         )}

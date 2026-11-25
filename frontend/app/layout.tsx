@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 
-// Inter (Numa's typeface), self-hosted from @fontsource-variable/inter: no network at build or run time.
+// Inter (the app's typeface), self-hosted from @fontsource-variable/inter: no network at build or run time.
 const inter = localFont({
   src: "../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2",
   variable: "--font-inter",
@@ -11,9 +11,9 @@ const inter = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Numa — Conversation",
+  title: "Local Speech-to-Speech",
   description:
-    "A local-first AI voice assistant: talk with Numa out loud, with every model running on your Mac.",
+    "Real-time spoken conversations with a local AI assistant, with every model running on your Mac.",
 };
 
 export const viewport: Viewport = {

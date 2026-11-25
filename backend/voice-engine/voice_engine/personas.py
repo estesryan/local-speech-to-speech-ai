@@ -22,7 +22,7 @@ from .interruption import ENGINE_INSTRUCTIONS
 from .paths import PERSONAS_DIR
 from .voices import CONVERSATION_DEFAULT, PRESET_ID, is_voice_id
 
-DEFAULT_PERSONA = "numa-assistant"
+DEFAULT_PERSONA = "assistant"
 _FIELDS = {"host", "voice", "prompt"}
 
 

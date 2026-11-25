@@ -47,17 +47,16 @@ describe("voiceUrl", () => {
         "ws://127.0.0.1:8765/v1/realtime",
       ),
     );
-    expect(url.searchParams.get("persona")).toBe("numa-assistant");
+    expect(url.searchParams.get("persona")).toBe("assistant");
     expect([...url.searchParams.keys()]).toEqual(["persona"]);
   });
 });
 
 describe("connectRealtime", () => {
   it("opens with the realtime subprotocol and configures the session after session.created", async () => {
-    const pending = connectRealtime(
-      "ws://x/v1/realtime?persona=numa-assistant",
-      { socket },
-    );
+    const pending = connectRealtime("ws://x/v1/realtime?persona=assistant", {
+      socket,
+    });
     const ws = FakeSocket.last;
     expect(ws.protocols).toEqual(["realtime"]);
     ws.serverSends({ type: "session.created" });
@@ -111,9 +110,9 @@ describe("connectRealtime", () => {
     expect(error).toMatchObject({ code: "backend-unavailable" });
     const message = (error as Error).message;
     expect(message).toContain("ws://127.0.0.1:8765/v1/realtime.");
-    expect(message).toContain("uv run numa-voice serve"); // not running
+    expect(message).toContain("uv run voice-engine serve"); // not running
     expect(message).toContain(window.location.origin); // or this page's origin is not allowed
-    expect(message).toContain("NUMA_VOICE_ALLOWED_ORIGINS");
+    expect(message).toContain("VOICE_ENGINE_ALLOWED_ORIGINS");
   });
 
   it("times out if the engine never answers", async () => {

@@ -5,10 +5,10 @@ import shutil
 import pytest
 import yaml
 
-from numa_voice import profiles
-from numa_voice.interruption import ENGINE_INSTRUCTIONS
-from numa_voice.paths import PERSONAS_DIR, PROFILES_DIR, VOICE_ENGINE_DIR
-from numa_voice.personas import DEFAULT_PERSONA, PersonaError, available_personas, load_persona
+from voice_engine import profiles
+from voice_engine.interruption import ENGINE_INSTRUCTIONS
+from voice_engine.paths import PERSONAS_DIR, PROFILES_DIR, VOICE_ENGINE_DIR
+from voice_engine.personas import DEFAULT_PERSONA, PersonaError, available_personas, load_persona
 
 # The fixed prompt the integration tests and benchmark driver run with; changing it makes results incomparable.
 REN_TEST_PROMPT = (
@@ -25,9 +25,9 @@ REN_TEST_PROMPT = (
 
 
 def test_the_default_persona_is_the_conversation_assistant():
-    assert DEFAULT_PERSONA == "numa-assistant"
+    assert DEFAULT_PERSONA == "assistant"
     p = load_persona(DEFAULT_PERSONA)
-    assert (p.host, p.voice) == ("Numa", "conversation-default")
+    assert (p.host, p.voice) == ("Assistant", "conversation-default")
 
 
 @pytest.mark.parametrize("name", available_personas())
@@ -81,11 +81,11 @@ def test_the_rendered_profile_carries_the_composed_prompt(tmp_path, name):
 
 def test_personas_live_beside_the_profiles():
     assert PERSONAS_DIR == VOICE_ENGINE_DIR / "personas"
-    assert set(available_personas()) == {"numa-assistant", "ren-test"}
+    assert set(available_personas()) == {"assistant", "ren-test"}
 
 
 def test_persona_ids_cannot_reach_outside_the_personas_directory():
-    for name in ("../profiles/base", "Numa-Assistant", "numa assistant"):
+    for name in ("../profiles/base", "Assistant", "voice assistant"):
         with pytest.raises(PersonaError):
             load_persona(name)
 
@@ -95,12 +95,12 @@ def test_every_frontend_mode_names_an_existing_persona():
     import json
 
     modes = json.loads((VOICE_ENGINE_DIR.parents[1] / "frontend/lib/session/modes.json").read_text())
-    assert {m["persona"] for m in modes.values()} == {"numa-assistant"}
+    assert {m["persona"] for m in modes.values()} == {"assistant"}
 
 
 def test_each_persona_fixes_its_voice():
     assert load_persona("ren-test").voice == "preset-aiden"  # benchmarks keep their voice
-    assert load_persona("numa-assistant").voice == "conversation-default"
+    assert load_persona("assistant").voice == "conversation-default"
 
 
 def test_no_persona_can_take_a_saved_voice(tmp_path):

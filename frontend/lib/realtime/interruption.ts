@@ -1,7 +1,7 @@
 /**
  * Keep the voice engine's history true to what the user heard when they interrupt the assistant.
  *
- * A port of backend/voice-engine/numa_voice/interruption.py (read its docstring for the why). Upstream cancels an
+ * A port of backend/voice-engine/voice_engine/interruption.py (read its docstring for the why). Upstream cancels an
  * interrupted reply but drops it from its history, and only the client knows how much audio was played. So when
  * the assistant is cut off, the unheard reply is deleted (if it was already finalized) and a note quoting the complete
  * sentences the user heard is added on the user's side. Both implementations replay the same event traces

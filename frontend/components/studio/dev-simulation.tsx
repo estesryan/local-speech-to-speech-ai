@@ -17,13 +17,13 @@ export function DevSimulation({
   onSimulate: (event: "processing" | "speaking" | "done") => void;
 }) {
   const button =
-    "rounded-full border border-border px-3 py-1.5 text-xs text-numa-slate transition-colors duration-200 hover:border-numa-slate/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-40";
+    "rounded-full border border-border px-3 py-1.5 text-xs text-app-slate transition-colors duration-200 hover:border-app-slate/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-40";
   return (
     <aside
       aria-label="Development simulation"
-      className="flex flex-wrap items-center gap-2 rounded-2xl border border-dashed border-numa-slate/25 px-4 py-3"
+      className="flex flex-wrap items-center gap-2 rounded-2xl border border-dashed border-app-slate/25 px-4 py-3"
     >
-      <span className="mr-1 text-[11px] font-medium tracking-[0.1em] text-numa-slate/70 uppercase">
+      <span className="mr-1 text-[11px] font-medium tracking-[0.1em] text-app-slate/70 uppercase">
         Dev simulation
       </span>
       <button

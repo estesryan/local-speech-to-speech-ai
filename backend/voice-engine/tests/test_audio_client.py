@@ -11,7 +11,7 @@ from openai.types.realtime import RealtimeServerEvent
 from pydantic import TypeAdapter
 from speech_to_speech.api.openai_realtime import audio_client as ac
 
-from numa_voice.patches.audio_client import InterruptionAwareCoordinator, TrackingPlaybackBuffer
+from voice_engine.patches.audio_client import InterruptionAwareCoordinator, TrackingPlaybackBuffer
 
 RATE = 16000
 TRACES = sorted((Path(__file__).parent / "fixtures" / "traces").glob("*.json"))

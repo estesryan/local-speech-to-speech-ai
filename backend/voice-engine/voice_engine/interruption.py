@@ -39,7 +39,7 @@ NOTE_HEARD = NOTE_PREFIX + ' They heard you say: "{heard}" Then they cut you off
 NOTE_FEW_WORDS = NOTE_PREFIX + " They cut you off before you finished your first sentence.)"
 NOTE_NOTHING_HEARD = NOTE_PREFIX + " They had not heard your reply yet.)"
 
-# Appended to every persona's prompt (numa_voice/personas.py): how the assistant must treat the notes above.
+# Appended to every persona's prompt (voice_engine/personas.py): how the assistant must treat the notes above.
 ENGINE_INSTRUCTIONS = (
     "A guest message may begin with a note in parentheses saying the guest interrupted you and what they had "
     "heard. Treat it as context only: never read it aloud, and do not repeat, finish or rephrase what you were "

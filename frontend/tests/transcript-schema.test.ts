@@ -85,7 +85,7 @@ describe("applying transcript events", () => {
   const events: unknown[] = [
     { type: "entry.started", entryId: "u1", speaker: "user", atMs: 0 },
     { type: "entry.delta", entryId: "u1", text: "Tell me ", atMs: 400 },
-    { type: "entry.delta", entryId: "u1", text: "about Numa", atMs: 900 },
+    { type: "entry.delta", entryId: "u1", text: "about Mars", atMs: 900 },
   ];
 
   function replay(
@@ -104,7 +104,7 @@ describe("applying transcript events", () => {
         speakerName: null,
         startedAtMs: 0,
         endedAtMs: null,
-        text: "Tell me about Numa",
+        text: "Tell me about Mars",
         status: "streaming",
       },
     ]);
@@ -116,7 +116,7 @@ describe("applying transcript events", () => {
         {
           type: "entry.completed",
           entryId: "u1",
-          text: "Tell me about Numa.",
+          text: "Tell me about Mars.",
           atMs: 1100,
         },
       ],
@@ -124,14 +124,14 @@ describe("applying transcript events", () => {
     );
     expect(final[0]).toMatchObject({
       status: "final",
-      text: "Tell me about Numa.",
+      text: "Tell me about Mars.",
       endedAtMs: 1100,
     });
     const kept = replay(
       [{ type: "entry.completed", entryId: "u1", atMs: 1100 }],
       replay(events),
     );
-    expect(kept[0]?.text).toBe("Tell me about Numa");
+    expect(kept[0]?.text).toBe("Tell me about Mars");
   });
 
   it("ignores deltas for unknown or finished entries instead of inventing text", () => {

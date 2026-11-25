@@ -11,7 +11,7 @@ function run(
   guest: string | null = "Alex",
 ) {
   let t = 0;
-  const adapter = new TranscriptAdapter({ host: "Numa", guest }, () => t);
+  const adapter = new TranscriptAdapter({ host: "Assistant", guest }, () => t);
   let entries: TranscriptEntry[] = [];
   events.forEach((event, i) => {
     t = i * 100;
@@ -72,7 +72,7 @@ describe("TranscriptAdapter", () => {
       entries.map((e) => [e.speaker, e.speakerName, e.text, e.status]),
     ).toEqual([
       ["user", "Alex", "Hello there.", "final"],
-      ["host", "Numa", "Hi Alex! How are you?", "final"],
+      ["host", "Assistant", "Hi Alex! How are you?", "final"],
     ]);
     expect(entries[0]?.startedAtMs).toBe(0); // timed from speech start, not from the first words
   });
@@ -108,7 +108,7 @@ describe("TranscriptAdapter", () => {
     expect(entries.map((e) => e.text)).toEqual(["Spoken."]);
   });
 
-  it("keeps only the words heard when Numa is interrupted", () => {
+  it("keeps only the words heard when the assistant is interrupted", () => {
     const entries = run(
       [
         { type: "response.created", response: { id: "r1" } },

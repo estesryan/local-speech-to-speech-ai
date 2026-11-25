@@ -1,4 +1,4 @@
-"""Serve the Voice Studio API (numa_voice/voice_api.py) from the Realtime server's own app.
+"""Serve the Voice Studio API (voice_engine/voice_api.py) from the Realtime server's own app.
 
 The browser calls it cross-origin (localhost:3000 -> 127.0.0.1:8765), so CORS headers are added for the same
 origins the Origin allowlist admits (patches/origin.py rejects every other origin before this runs). Whether a
@@ -50,4 +50,4 @@ def apply(allowed_origins: Iterable[str]) -> str:
 
     server.create_app = create_app
     pt.ParakeetTDTSTTHandler.setup = _stt_setup
-    return "voice studio: /v1/numa/voices API for saved voices, previews and voice creation"
+    return "voice studio: /v1/voices API for saved voices, previews and voice creation"

@@ -1,16 +1,16 @@
-"""numa-voice: set up models, render profiles and launch the local voice engine.
+"""voice-engine: set up models, render profiles and launch the local voice engine.
 
-    numa-voice models list
-    numa-voice models download --profile fast      # pinned revisions, only this profile's models
-    numa-voice models migrate  --profile all       # copy from a local Hugging Face cache (--source; no download)
-    numa-voice models verify   --profile fast      # sizes + SHA-256, then upstream config validation
-    numa-voice config --profile fast --persona ren-test   # print the rendered upstream configuration
-    numa-voice run    --profile fast [--speakers]         # standalone conversation: mic + speakers (upstream client)
-    numa-voice serve  --profile fast                      # Realtime server only: ws://127.0.0.1:8765/v1/realtime
-    numa-voice talk                                       # upstream client against a running server
+    voice-engine models list
+    voice-engine models download --profile fast      # pinned revisions, only this profile's models
+    voice-engine models migrate  --profile all       # copy from a local Hugging Face cache (--source; no download)
+    voice-engine models verify   --profile fast      # sizes + SHA-256, then upstream config validation
+    voice-engine config --profile fast --persona ren-test   # print the rendered upstream configuration
+    voice-engine run    --profile fast [--speakers]         # standalone conversation: mic + speakers (upstream client)
+    voice-engine serve  --profile fast                      # Realtime server only: ws://127.0.0.1:8765/v1/realtime
+    voice-engine talk                                       # upstream client against a running server
 
-Running commands are offline: models load by path from the models root ($NUMA_MODELS_DIR or <project>/models).
-The profile picks models; the persona (personas/, default numa-assistant) picks the assistant.
+Running commands are offline: models load by path from the models root ($VOICE_ENGINE_MODELS_DIR or <project>/models).
+The profile picks models; the persona (personas/, default assistant) picks the assistant.
 """
 
 from __future__ import annotations
@@ -103,7 +103,7 @@ def _launch(command: str, args: argparse.Namespace) -> int:
                    if verify(load_manifest()[mid], root, deep=False)]
         if missing:
             print(f"models missing or incomplete under {root}: {missing}\n"
-                  f"run: numa-voice models download --profile {args.profile}", file=sys.stderr)
+                  f"run: voice-engine models download --profile {args.profile}", file=sys.stderr)
             return 1
     apply_runtime_env(root)  # before importing upstream: huggingface_hub reads HF_HUB_OFFLINE at import time
     from .patches import apply_client_patches, apply_server_patches
@@ -112,7 +112,7 @@ def _launch(command: str, args: argparse.Namespace) -> int:
     if command in ("local", "talk"):
         applied += apply_client_patches()
     for line in applied:
-        print(f"[numa-voice] {line}", file=sys.stderr)
+        print(f"[voice-engine] {line}", file=sys.stderr)
     if command == "talk":
         sys.argv = ["speech-to-speech", "talk", "--url", args.url]
     else:
@@ -120,9 +120,9 @@ def _launch(command: str, args: argparse.Namespace) -> int:
 
         config = write_resolved(args.profile, persona=args.persona, speakers=getattr(args, "speakers", False),
                                 root=root)
-        print(f"[numa-voice] profile {args.profile}, persona {args.persona}, models from {root}, offline",
+        print(f"[voice-engine] profile {args.profile}, persona {args.persona}, models from {root}, offline",
               file=sys.stderr)
-        sys.argv = ["speech-to-speech", command, "-f", str(config), "--name", "numa"]
+        sys.argv = ["speech-to-speech", command, "-f", str(config), "--name", "default"]
     from speech_to_speech.cli import main as upstream_main
 
     upstream_main()
@@ -130,12 +130,12 @@ def _launch(command: str, args: argparse.Namespace) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(prog="numa-voice", description=__doc__,
+    parser = argparse.ArgumentParser(prog="voice-engine", description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--version", action="version", version=f"numa-voice {__version__}")
+    parser.add_argument("--version", action="version", version=f"voice-engine {__version__}")
     sub = parser.add_subparsers(dest="cmd", required=True)
     profile_help = f"one of: {', '.join(available_profiles())} (default {DEFAULT_PROFILE})"
-    persona_default = os.environ.get("NUMA_VOICE_PERSONA", DEFAULT_PERSONA)
+    persona_default = os.environ.get("VOICE_ENGINE_PERSONA", DEFAULT_PERSONA)
     persona_help = f"persona, one of: {', '.join(available_personas())} (default {persona_default})"
 
     m = sub.add_parser("models", help="list, download, migrate, verify or lock model files")
@@ -155,14 +155,14 @@ def main(argv: list[str] | None = None) -> int:
     for name, command, text in (("run", "local", "standalone conversation with mic and speakers"),
                                 ("serve", "serve", "Realtime server only")):
         p = sub.add_parser(name, help=text)
-        p.add_argument("--profile", default=os.environ.get("NUMA_VOICE_PROFILE", DEFAULT_PROFILE), help=profile_help)
+        p.add_argument("--profile", default=os.environ.get("VOICE_ENGINE_PROFILE", DEFAULT_PROFILE), help=profile_help)
         p.add_argument("--persona", default=persona_default, help=persona_help)
         if name == "run":
             p.add_argument("--speakers", action="store_true",
                            help="laptop speakers: mute the mic while the assistant talks (disables barge-in)")
         p.set_defaults(func=lambda a, c=command: _launch(c, a))
 
-    t = sub.add_parser("talk", help="upstream audio client (with Numa's interruption fix) for a running server")
+    t = sub.add_parser("talk", help="upstream audio client (with the interruption fix) for a running server")
     t.add_argument("--url", default="ws://127.0.0.1:8765/v1/realtime")
     t.set_defaults(func=lambda a: _launch("talk", a))
 
@@ -170,7 +170,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         return args.func(args)
     except (ProfileError, PersonaError, UpstreamIncompatible) as error:
-        print(f"numa-voice: {error}", file=sys.stderr)
+        print(f"voice-engine: {error}", file=sys.stderr)
         return 2
 
 

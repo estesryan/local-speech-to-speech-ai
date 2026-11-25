@@ -20,7 +20,7 @@ import pytest
 import realtime_bench as rb
 import soundfile as sf
 
-from numa_voice.voice_models import capabilities
+from voice_engine.voice_models import capabilities
 
 from test_live_engine import text_turn
 
@@ -33,7 +33,7 @@ TURNS = ["Hello! How are you today?", "Tell me one nice thing about autumn.", "T
 
 @pytest.fixture(autouse=True)
 def own_engine_only(engine):
-    """These tests create and delete voices: never in an engine started elsewhere (NUMA_VOICE_TEST_URL), whose voice
+    """These tests create and delete voices: never in an engine started elsewhere (VOICE_ENGINE_TEST_URL), whose voice
     store may hold someone's real recordings."""
     if engine.voices is None:
         pytest.skip("Voice Studio tests run only against the engine they start, with a temporary voice store")
@@ -42,7 +42,7 @@ def own_engine_only(engine):
 def http(engine, method: str, path: str, body: bytes | dict | None = None, content_type="application/json"):
     base = engine.url.replace("ws://", "http://").split("/v1/")[0]
     data = json.dumps(body).encode() if isinstance(body, dict) else body
-    request = Request(f"{base}/v1/numa/voices{path}", data=data, method=method,
+    request = Request(f"{base}/v1/voices{path}", data=data, method=method,
                       headers={"content-type": content_type} if data is not None else {})
     with urlopen(request, timeout=300) as response:
         return response.status, response.read(), response.headers.get("content-type")
@@ -55,7 +55,7 @@ def speaker_embedding():
     import soxr
     from mlx_audio.tts.utils import load_model
 
-    from numa_voice.voice_models import model_path
+    from voice_engine.voice_models import model_path
 
     model = load_model(str(model_path("tts/qwen3-tts-1.7b-base-6bit")))
 
@@ -137,8 +137,8 @@ def test_conversation_speaks_live_in_the_default_voice_and_a_preset_persona_keep
     reference = speaker_embedding(*sf.read(engine.voices / voice["id"] / "reference.wav"))
     http(engine, "PUT", "/default", {"voice_id": voice["id"]})
 
-    notice, custom = asyncio.run(session(engine, "numa-assistant"))
-    assert notice["type"] == "numa.session" and notice["voice"]["id"] == voice["id"] and not notice["voice_fallback"]
+    notice, custom = asyncio.run(session(engine, "assistant"))
+    assert notice["type"] == "voice_engine.session" and notice["voice"]["id"] == voice["id"] and not notice["voice_fallback"]
     assert notice["busy_during_session"] is True  # previews and creation wait for the conversation
     custom_pitch = [median_pitch(t["audio"], rb.RATE) for t in custom]
     assert all(abs(p - reference_pitch) / reference_pitch < 0.25 for p in custom_pitch), (reference_pitch, custom_pitch)
@@ -176,7 +176,7 @@ def test_generation_is_refused_while_a_conversation_runs(engine, created):
     voice, _ = created
 
     async def preview_during_session():
-        async with await rb.connect(f"{engine.url}?persona=numa-assistant"):
+        async with await rb.connect(f"{engine.url}?persona=assistant"):
             await asyncio.sleep(0.5)
             try:
                 http(engine, "POST", "/preview", {"voice_id": voice["id"]})

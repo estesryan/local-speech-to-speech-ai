@@ -27,7 +27,7 @@ from .manifest import load_manifest, verify
 from .paths import models_root
 from .voices import CLONE_MODEL, DESIGN_MODEL, SAMPLE_RATE, Voice, VoiceError, VoiceStore, wav_bytes
 
-logger = logging.getLogger("numa_voice.voice_models")
+logger = logging.getLogger("voice_engine.voice_models")
 STT_MODEL = "stt/parakeet-tdt-0.6b-v3"
 
 # Read by the designed voice; it becomes the voice's reference, so it is neutral and phonetically varied.
@@ -108,7 +108,7 @@ def capabilities() -> dict[str, dict[str, Any]]:
     def present(model_id: str) -> str | None:
         problems = verify(manifest[model_id], models_root(), deep=False) if manifest[model_id].files else ["missing"]
         if problems:
-            return f"needs {model_id}: run `uv run numa-voice models download --ids {model_id}`"
+            return f"needs {model_id}: run `uv run voice-engine models download --ids {model_id}`"
         return None
 
     clone, design = present(CLONE_MODEL), present(DESIGN_MODEL)
@@ -159,7 +159,7 @@ def warm_base_model() -> None:
             logger.warning("Could not preload the Qwen3-TTS Base model: %s", error)
 
     if _base is None:
-        threading.Thread(target=load, name="numa-base-preload", daemon=True).start()
+        threading.Thread(target=load, name="base-model-preload", daemon=True).start()
 
 
 def _release() -> None:

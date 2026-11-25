@@ -1,4 +1,4 @@
-# Numa ignore rules for the whole repository. frontend/.gitignore repeats the frontend entries for Biome.
+# Ignore rules for the whole repository. frontend/.gitignore repeats the frontend entries for Biome.
 # A leading "/" anchors a pattern to the repository root; other patterns match at any depth.
 
 # Dependencies and virtual environments
@@ -16,7 +16,7 @@ dist/
 next-env.d.ts
 out/
 
-# Downloaded models: fetched by `numa-voice models download`, pinned in backend/voice-engine/model-manifest.yaml
+# Downloaded models: fetched by `voice-engine models download`, pinned in backend/voice-engine/model-manifest.yaml
 /models/
 *.gguf
 *.npz

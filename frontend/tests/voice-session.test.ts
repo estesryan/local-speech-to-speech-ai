@@ -115,7 +115,7 @@ describe("VoiceSession", () => {
     await t.session.connect(t.mic);
     const url = new URL(t.connect.mock.calls[0]?.[0] ?? "");
     expect([...url.searchParams.keys()]).toEqual(["persona"]);
-    expect(url.searchParams.get("persona")).toBe("numa-assistant");
+    expect(url.searchParams.get("persona")).toBe("assistant");
   });
 
   it("streams the microphone as 16 kHz PCM16", async () => {
@@ -126,7 +126,7 @@ describe("VoiceSession", () => {
     expect(base64ToBytes(String(append?.audio)).length).toBe(640 * 2);
   });
 
-  it("plays Numa's audio and reports speaking", async () => {
+  it("plays the assistant's audio and reports speaking", async () => {
     const t = setup();
     await t.session.connect(t.mic);
     t.server({ type: "response.created", response: { id: "r1" } });
@@ -198,7 +198,7 @@ describe("VoiceSession", () => {
     expect(t.activity).toEqual(["processing-started", "processing-ended"]);
   });
 
-  it("can send silence while Numa speaks (half-duplex for speakers without echo cancellation)", async () => {
+  it("can send silence while the assistant speaks (half-duplex for speakers without echo cancellation)", async () => {
     const t = setup({ halfDuplex: true });
     await t.session.connect(t.mic);
     t.server({ type: "response.created", response: { id: "r1" } });
@@ -262,7 +262,7 @@ describe("audio the browser holds back", () => {
 });
 
 describe("studio controls", () => {
-  it("mutes Numa's voice without ending anything", async () => {
+  it("mutes the assistant's voice without ending anything", async () => {
     const t = setup();
     await t.session.connect(t.mic);
     t.session.setOutputMuted(true);

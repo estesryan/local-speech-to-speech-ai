@@ -4,8 +4,8 @@ import pytest
 import speech_to_speech
 from speech_to_speech.api.openai_realtime import audio_client as ac
 
-from numa_voice import patches
-from numa_voice.patches import UpstreamIncompatible, audio_client, compaction, require, require_source
+from voice_engine import patches
+from voice_engine.patches import UpstreamIncompatible, audio_client, compaction, require, require_source
 
 
 def test_the_installed_upstream_is_the_tested_version():
@@ -15,7 +15,7 @@ def test_the_installed_upstream_is_the_tested_version():
 
 def test_an_untested_version_stops_both_launch_paths(monkeypatch):
     monkeypatch.setattr(speech_to_speech, "__version__", "1.2.0")
-    monkeypatch.delenv("NUMA_VOICE_ALLOW_UNTESTED_UPSTREAM", raising=False)
+    monkeypatch.delenv("VOICE_ENGINE_ALLOW_UNTESTED_UPSTREAM", raising=False)
     for apply in (patches.apply_server_patches, patches.apply_client_patches):
         with pytest.raises(UpstreamIncompatible, match="1.2.0"):
             apply()
@@ -54,7 +54,7 @@ def test_audio_client_patch_checks_the_event_order(monkeypatch):
 
 def test_the_version_override_does_not_skip_the_code_checks(monkeypatch):
     monkeypatch.setattr(speech_to_speech, "__version__", "1.2.0")
-    monkeypatch.setenv("NUMA_VOICE_ALLOW_UNTESTED_UPSTREAM", "1")
+    monkeypatch.setenv("VOICE_ENGINE_ALLOW_UNTESTED_UPSTREAM", "1")
     patches.check_upstream_version()  # allowed
     monkeypatch.delattr(ac, "_ToolCallCoordinator")
     with pytest.raises(UpstreamIncompatible):
@@ -64,36 +64,36 @@ def test_the_version_override_does_not_skip_the_code_checks(monkeypatch):
 def test_custom_voice_patch_checks_the_tts_handler_it_extends():
     from speech_to_speech.TTS import qwen3_tts_handler as qt
 
-    from numa_voice.patches import custom_voice
+    from voice_engine.patches import custom_voice
 
     with pytest.raises(UpstreamIncompatible, match="no longer contains"):
         require_source(qt.Qwen3TTSHandler.process, *("self._apply_session_voice_override(model_type, runtime_config, "
                                                       "response)", "self._process_voice_clone_v2("))
-    assert custom_voice.TOKEN == "numa-voice:"
+    assert custom_voice.TOKEN == "saved-voice:"
 
 
 def test_custom_voice_routing_leaves_presets_to_upstream(monkeypatch):
     from types import SimpleNamespace
 
-    from numa_voice.patches import custom_voice
+    from voice_engine.patches import custom_voice
 
     calls = []
     monkeypatch.setitem(custom_voice._ORIGINAL, "_apply_session_voice_override",
                         lambda self, model_type, rc=None, resp=None: calls.append("upstream"))
-    handler = SimpleNamespace(_numa_voice=("voice-0123456789ab", {}))
+    handler = SimpleNamespace(_saved_voice=("voice-0123456789ab", {}))
     session = SimpleNamespace(session=SimpleNamespace(audio=SimpleNamespace(output=SimpleNamespace(voice="aiden"))))
     custom_voice._apply_session_voice_override(handler, "custom_voice", session, None)
-    assert calls == ["upstream"] and handler._numa_voice is None
+    assert calls == ["upstream"] and handler._saved_voice is None
 
 
 def test_a_missing_saved_voice_is_silent_not_replaced(monkeypatch):
     from types import SimpleNamespace
 
-    from numa_voice.patches import custom_voice
+    from voice_engine.patches import custom_voice
 
-    handler = SimpleNamespace(_numa_voice=None, backend="mlx")
+    handler = SimpleNamespace(_saved_voice=None, backend="mlx")
     session = SimpleNamespace(session=SimpleNamespace(audio=SimpleNamespace(
-        output=SimpleNamespace(voice="numa-voice:voice-0123456789ab"))))
+        output=SimpleNamespace(voice="saved-voice:voice-0123456789ab"))))
     custom_voice._apply_session_voice_override(handler, "custom_voice", session, None)
-    assert handler._numa_voice == ("voice-0123456789ab", None)
+    assert handler._saved_voice == ("voice-0123456789ab", None)
     assert list(custom_voice._process_custom_voice(handler, "Hello.")) == []  # no audio, never a preset instead

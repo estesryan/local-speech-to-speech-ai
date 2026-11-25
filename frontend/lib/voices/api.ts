@@ -1,5 +1,5 @@
 /**
- * Voice Studio API of the local voice engine (backend/voice-engine/numa_voice/voice_api.py), on the same host as
+ * Voice Studio API of the local voice engine (backend/voice-engine/voice_engine/voice_api.py), on the same host as
  * the Realtime WebSocket. Every generation runs on the engine's real models; errors carry the engine's message.
  */
 
@@ -56,7 +56,7 @@ export class VoiceApiError extends Error {
 export function voicesBaseUrl(realtimeUrl = DEFAULT_VOICE_URL): string {
   const url = new URL(realtimeUrl);
   url.protocol = url.protocol === "wss:" ? "https:" : "http:";
-  return `${url.origin}/v1/numa/voices`;
+  return `${url.origin}/v1/voices`;
 }
 
 export type Fetch = typeof fetch;

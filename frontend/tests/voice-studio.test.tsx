@@ -74,7 +74,7 @@ describe("Voice Studio panel", () => {
     );
     await user.click(
       within(aiden as HTMLElement).getByRole("button", {
-        name: "Set as Numa default",
+        name: "Set as default voice",
       }),
     );
     expect(api.setDefault).toHaveBeenCalledWith("preset-aiden");
@@ -101,7 +101,7 @@ describe("Voice Studio panel", () => {
     );
     await user.click(
       within(aiden as HTMLElement).getByRole("button", {
-        name: "Set as Numa default",
+        name: "Set as default voice",
       }),
     );
     expect(
